@@ -446,10 +446,10 @@ export default class AggregationBuilder {
    * @type {Number} - Limit
    * @return this stage
    */
-  limit: (limit: Number, options?: Options) => AggregationBuilder = function (
-    limit,
-    options
-  ) {
+  limit: (
+    limit: Number | any,
+    options?: Options
+  ) => AggregationBuilder = function (limit, options) {
     if (options && options.only && this.only(`${options.only}`)) return this;
     if (options && options.alone && this.alone(`${options.alone}_limit`))
       return this;
@@ -464,10 +464,10 @@ export default class AggregationBuilder {
    * @type {Number} - skip
    * @return this stage
    */
-  skip: (skip: Number, options?: Options) => AggregationBuilder = function (
-    skip,
-    options
-  ) {
+  skip: (
+    skip: Number | any,
+    options?: Options
+  ) => AggregationBuilder = function (skip, options) {
     if (options && options.only && this.only(`${options.only}`)) return this;
     if (options && options.alone && this.alone(`${options.alone}_skip`))
       return this;

@@ -274,14 +274,14 @@ export default class AggregationBuilder {
    * @type {Number} - Limit
    * @return this stage
    */
-  limit: (limit: Number, options?: Options) => AggregationBuilder;
+  limit: (limit: Number | any, options?: Options) => AggregationBuilder;
   /**
    * @method skip Stage
    *Skips over the specified number of documents that pass into the stage and passes the remaining documents to the next stage in the pipeline.
    * @type {Number} - skip
    * @return this stage
    */
-  skip: (skip: Number, options?: Options) => AggregationBuilder;
+  skip: (skip: Number | any, options?: Options) => AggregationBuilder;
   /**
    * @method set Stage
    * replaces the value of a field with the specified value.
@@ -624,9 +624,9 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   size: (
-    key: string
+    key: string | any[]
   ) => {
-    $size: string;
+    $size: string | any[];
   };
   /**
    * @method mergeObjects Operator
