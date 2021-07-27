@@ -883,11 +883,12 @@ export default class AggregationBuilder {
   /**
    * @method in Operator
    * Returns a boolean indicating whether a specified value is in an array.
-   * @type {any[]} - key
+   * @type {any} - exp
+   * @type {any[]} - arrExp
    * @returns this operator
    */
-  in = function (key: any[]) {
-    return { $in: key };
+  in = function (exp: any, arrExp: any) {
+    return { $in: [exp, arrExp] };
   };
   /**
    * @method size Operator
@@ -895,7 +896,7 @@ export default class AggregationBuilder {
    * @type {string} - key
    * @returns this operator
    */
-  size = function (key: string) {
+  size = function (key: string | any[]) {
     return { $size: key };
   };
   /**
