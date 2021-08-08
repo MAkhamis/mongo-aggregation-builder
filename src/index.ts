@@ -439,16 +439,18 @@ export default class AggregationBuilder {
    * @type {[propName: string]: string | any} - filelds ,
    * @return this stage
    */
-  addFields: (filelds: AddFields, options?: Options) => AggregationBuilder =
-    function (filelds, options) {
-      if (!this.openStage("addFields", options)) return this;
-      /**
-       * @see AddFields
-       */
-      const stage = { $addFields: filelds };
-      this.closeStage(stage);
-      return this;
-    };
+  addFields: (
+    filelds: AddFields,
+    options?: Options
+  ) => AggregationBuilder = function (filelds, options) {
+    if (!this.openStage("addFields", options)) return this;
+    /**
+     * @see AddFields
+     */
+    const stage = { $addFields: filelds };
+    this.closeStage(stage);
+    return this;
+  };
   /**
    * @method project Stage
    * specified fields can be existing fields from the input documents or newly computed fields.
@@ -472,27 +474,29 @@ export default class AggregationBuilder {
       throw e;
     }
   };
-  amendProject: (projection: Project, options?: Options) => AggregationBuilder =
-    (projection, options) => {
-      try {
-        if (!this.openStage("project", options)) return this;
-        let latestStage = this.aggs[this.aggs.length - 1];
-        if (!latestStage.hasOwnProperty("$project")) {
-          if (!this.isFacet) return this;
-          else {
-            const key: string = this.currentFacetKey || "";
-            latestStage =
-              latestStage.$facet[key][latestStage.$facet[key].length - 1];
-            if (!latestStage.hasOwnProperty("$project")) return this;
-          }
+  amendProject: (
+    projection: Project,
+    options?: Options
+  ) => AggregationBuilder = (projection, options) => {
+    try {
+      if (!this.openStage("project", options)) return this;
+      let latestStage = this.aggs[this.aggs.length - 1];
+      if (!latestStage.hasOwnProperty("$project")) {
+        if (!this.isFacet) return this;
+        else {
+          const key: string = this.currentFacetKey || "";
+          latestStage =
+            latestStage.$facet[key][latestStage.$facet[key].length - 1];
+          if (!latestStage.hasOwnProperty("$project")) return this;
         }
-        Object.assign(latestStage.$project, projection);
-        return this;
-      } catch (e) {
-        console.error(e);
-        throw e;
       }
-    };
+      Object.assign(latestStage.$project, projection);
+      return this;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
   /**
    * @method limit Stage
    * Limits the number of documents passed to the next stage in the pipeline.
@@ -550,26 +554,29 @@ export default class AggregationBuilder {
    * @type {[propName: string]: any} - Group.propName
    * @return this stage
    */
-  group: (id: any, arg: Group, options?: Options) => AggregationBuilder =
-    function (id, arg, options) {
-      if (!this.openStage("group", options)) return this;
-      let stage: any;
-      /**
-       * @see Group
-       *
-       */
-      stage = { $group: arg };
-      stage.$group._id = id;
-      if (options?.checkLookup?.length) {
-        options.checkLookup.forEach((key) => {
-          if (stage.$group._id[key]) {
-            stage.$group._id[key] = `${stage.$group._id[key]}._id`;
-          }
-        });
-      }
-      this.closeStage(stage);
-      return this;
-    };
+  group: (
+    id: any,
+    arg: Group,
+    options?: Options
+  ) => AggregationBuilder = function (id, arg, options) {
+    if (!this.openStage("group", options)) return this;
+    let stage: any;
+    /**
+     * @see Group
+     *
+     */
+    stage = { $group: arg };
+    stage.$group._id = id;
+    if (options?.checkLookup?.length) {
+      options.checkLookup.forEach((key) => {
+        if (stage.$group._id[key]) {
+          stage.$group._id[key] = `${stage.$group._id[key]}._id`;
+        }
+      });
+    }
+    this.closeStage(stage);
+    return this;
+  };
   /**
    * @method amendGroup Stage
    * *****
@@ -791,7 +798,35 @@ export default class AggregationBuilder {
     }
     return stage;
   };
-
+  // /**
+  //  * @method  dateFromString   Operator
+  //  * Converts a date/time string to a date object.
+  //  * @type { String | Any} - dateString : The date/time string to convert to a date object.
+  //  * @type {String | Any} - format : Optional. The date format specification of the dateString
+  //  * @type {String | Any} - timezone : 	Optional. The time zone to use to format the date.
+  //  * @type {String | Any} - onError : Optional. If $dateFromString encounters an error while parsing the given dateString
+  //  * @type {String | Any} - onNull :Optional. If the dateString provided to $dateFromString is null or missing,
+  //  * @returns this stage
+  //  */
+  // dateFromString = function (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) {
+  //   try {
+  //     const stage: {
+  //       $dateFromString: {
+  //         dateString: string | any;
+  //         format?: string;
+  //         timezone?: string;
+  //         onNull?: string;
+  //       };
+  //     } = { $dateFromString: { dateString: dateString } };
+  //     if (format) stage.$dateFromString.format = format;
+  //     if (timezone) stage.$dateFromString.timezone = timezone;
+  //     if (onNull) stage.$dateFromString.onNull = onNull;
+  //     return stage;
+  //   } catch (e) {
+  //     console.error(e);
+  //     throw e;
+  //   }
+  // };
   /**
    * Concatenates strings and returns the concatenated string.
    * @method concat Operator
@@ -1221,7 +1256,7 @@ export default class AggregationBuilder {
    * @type {any} - arg
    * @returns this operator
    */
-  or = function (arg: any) {
+  or = function (arg: any[]) {
     return { $or: arg };
   };
   /**
@@ -1231,13 +1266,12 @@ export default class AggregationBuilder {
    * @type {any} - arg
    * @returns this operator
    */
-  and = function (arg: any) {
+  and = function (arg: any[]) {
     return { $and: arg };
   };
   /**
    * @method  gt Operator
-   * $and performs a logical AND operation on an array of one or more expressions
-   * and selects the documents that satisfy all the expressions in the array.
+   * selects those documents where the value of the field is greater than (i.e. >) the specified value
    * @type {any} - arr1
    * @type {any} - arr2
    * @returns this operator
@@ -1251,7 +1285,7 @@ export default class AggregationBuilder {
   };
   /**
    * @method  gte Operator
-   * selects those documents where the value of the field is greater than the specified value.
+   * selects the documents where the value of the field is greater than or equal to (i.e. >=) a specified value (e.g. value.)
    * @type {any } - arr1
    * @type {any} - arr2
    * @returns this operator
@@ -1338,6 +1372,7 @@ export default class AggregationBuilder {
    * Subtracts two numbers to return the difference
    * @type {Number | String | Any} - exp1
    * @type {Number | String | Any} - exp2
+
    * @returns this operator
    */
   subtract = function (
