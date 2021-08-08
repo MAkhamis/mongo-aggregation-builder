@@ -347,6 +347,24 @@ export default class AggregationBuilder {
      */
     replaceRoot: (key: string, options?: Options) => AggregationBuilder;
     /**
+     * @method  dateFromString   Operator
+     * Converts a date/time string to a date object.
+     * @type { String | Any} - dateString : The date/time string to convert to a date object.
+     * @type {String | Any} - format : Optional. The date format specification of the dateString
+     * @type {String | Any} - timezone : 	Optional. The time zone to use to format the date.
+     * @type {String | Any} - onError : Optional. If $dateFromString encounters an error while parsing the given dateString
+     * @type {String | Any} - onNull :Optional. If the dateString provided to $dateFromString is null or missing,
+     * @returns this stage
+     */
+    dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options | undefined) => {
+        $dateFromString: {
+            dateString: string | any;
+            format?: string | undefined;
+            timezone?: string | undefined;
+            onNull?: string | undefined;
+        };
+    };
+    /**
      * @method reduceAndConcat Stage
      * Replaces the input document with the specified document.
      *  @type {Any} - newRoot
@@ -600,11 +618,10 @@ export default class AggregationBuilder {
     /**
      * @method in Operator
      * Returns a boolean indicating whether a specified value is in an array.
-     * @type {any} - exp
-     * @type {any[]} - arrExp
+     * @type {any[]} - key
      * @returns this operator
      */
-    in: (exp: any, arrExp: any) => {
+    in: (key: any[]) => {
         $in: any[];
     };
     /**
@@ -613,8 +630,8 @@ export default class AggregationBuilder {
      * @type {string} - key
      * @returns this operator
      */
-    size: (key: string | any[]) => {
-        $size: string | any[];
+    size: (key: string) => {
+        $size: string;
     };
     /**
      * @method mergeObjects Operator
@@ -804,6 +821,61 @@ export default class AggregationBuilder {
      */
     strLenCP: (str: string) => {
         $strLenCP: string;
+    };
+    /**
+     * @method  subtract  Operator
+     * Subtracts two numbers to return the difference
+     * @type {Number | String | Any} - exp1
+     * @type {Number | String | Any} - exp2
+     * @returns this operator
+     */
+    subtract: (exp1: Number | String | any, exp2: Number | String | any) => {
+        $subtract: any[];
+    };
+    /**
+     * @method  divide  Operator
+     * Divides one number by another and returns the result.
+     * * @type {Number | String | Any} - exp1
+     * @type {Number | String | Any} - exp2
+     * @returns this operator
+     */
+    divide: (exp1: Number | String | any, exp2: Number | String | any) => {
+        $divide: any[];
+    };
+    /**
+     * @method  add  Operator
+     * Adds numbers together or adds numbers and a date.
+     * * @type {Number | String | Any} - exp1
+     * @type {Number | String | Any} - exp2
+     * @returns this operator
+     */
+    add: (exp1: Number | String | any, exp2: Number | String | any) => {
+        $add: any[];
+    };
+    /**
+     * @method  function  Operator
+     *Defines a custom aggregation function or expression in JavaScript.
+     * * @type {Any} - body
+     * @type { Any[]} - args
+     * @type {string} - lang
+     * @returns this operator
+     */
+    function: (body: any, args: any[], lang: string) => {
+        $function: {
+            body: any;
+            args: any[];
+            lang: string;
+        };
+    };
+    /**
+     * @method  isNumber    Operator
+     * checks if the specified expression resolves to one of the following numeric BSON
+     * @type {string | number} - arg
+  
+     * @returns this operator
+     */
+    isNumber: (arg: string | number) => {
+        $isNumber: string | number;
     };
 }
 export {};
