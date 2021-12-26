@@ -292,6 +292,13 @@ export default class AggregationBuilder {
    */
   limit: (limit: Number, options?: Options) => AggregationBuilder;
   /**
+   * @method count Stage
+   * Passes a document to the next stage that contains a count of the number of documents input to the stage.
+   * @type {String} - String
+   * @return this stage
+   */
+  count: (string: String, options?: Options) => AggregationBuilder;
+  /**
    * @method skip Stage
    *Skips over the specified number of documents that pass into the stage and passes the remaining documents to the next stage in the pipeline.
    * @type {Number} - skip
