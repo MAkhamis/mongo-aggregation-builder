@@ -1700,4 +1700,36 @@ export default class AggregationBuilder {
       throw e;
     }
   };
+
+  /**
+   * @method  regexMatch  Operator
+   *Performs a regular expression (regex) pattern matching and returns: [true] if a match exists. [false] if a match doesn't exist.
+   * @type { string } - input - The string on which you wish to apply the regex pattern. Can be a string or any valid expression that resolves to a string.
+   * @type { string } - regex - The regex pattern to apply.
+   * @type { string } - options? - Optional. The following <options> are available for use with regular expression:
+   * [i] : Case insensitivity.
+   * [m] : For patterns that include anchors .
+   * [x] "Extended" capability to ignore all white space characters in the pattern unless escaped or included in a character class.
+   * [s] Allows the dot character.
+   * @returns this operator
+   *
+   */
+  regexMatch = function (input: string, regex: string, options?: string) {
+    try {
+      const stage = {
+        $regexMatch: {
+          input: `$${input}`,
+          regex: regex,
+          options: options,
+        },
+      };
+      if (options) {
+        stage.$regexMatch.options = options;
+      }
+      return stage;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
 }
