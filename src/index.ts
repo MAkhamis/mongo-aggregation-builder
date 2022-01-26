@@ -1210,8 +1210,29 @@ export default class AggregationBuilder {
    * @type {any[]} - arr2 ,
    * @returns this operator
    */
-  concatArrays = function (arr1: any[], arr2: any[]) {
-    return { $concatArrays: [arr1, arr2] };
+  concatArrays = function (
+    arr1: any[],
+    arr2: any[],
+    arr3?: any[],
+    arr4?: any[],
+    arr5?: any[],
+    arr6?: any[],
+    arr7?: any[],
+    arr8?: any[],
+    arr9?: any[],
+    arr10?: any[]
+  ) {
+    let arr = [arr1, arr2];
+    arr3 !== undefined ? arr.push(arr3) : 0;
+    arr4 !== undefined ? arr.push(arr4) : 0;
+    arr5 !== undefined ? arr.push(arr5) : 0;
+    arr6 !== undefined ? arr.push(arr6) : 0;
+    arr7 !== undefined ? arr.push(arr7) : 0;
+    arr8 !== undefined ? arr.push(arr8) : 0;
+    arr9 !== undefined ? arr.push(arr9) : 0;
+    arr10 !== undefined ? arr.push(arr10) : 0;
+
+    return { $concatArrays: arr };
   };
   /**
    * @method  accumulator Operator
