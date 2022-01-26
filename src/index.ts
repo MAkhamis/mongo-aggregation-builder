@@ -1211,16 +1211,16 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   concatArrays = function (
-    arr1: any[],
-    arr2: any[],
-    arr3?: any[],
-    arr4?: any[],
-    arr5?: any[],
-    arr6?: any[],
-    arr7?: any[],
-    arr8?: any[],
-    arr9?: any[],
-    arr10?: any[]
+    arr1: any | any[],
+    arr2: any | any[],
+    arr3?: any | any[],
+    arr4?: any | any[],
+    arr5?: any | any[],
+    arr6?: any | any[],
+    arr7?: any | any[],
+    arr8?: any | any[],
+    arr9?: any | any[],
+    arr10?: any | any[]
   ) {
     let arr = [arr1, arr2];
     arr3 !== undefined ? arr.push(arr3) : 0;

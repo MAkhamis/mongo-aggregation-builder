@@ -655,8 +655,8 @@ export default class AggregationBuilder {
      * @type {any[]} - arr2 ,
      * @returns this operator
      */
-    concatArrays: (arr1: any[], arr2: any[], arr3?: any[] | undefined, arr4?: any[] | undefined, arr5?: any[] | undefined, arr6?: any[] | undefined, arr7?: any[] | undefined, arr8?: any[] | undefined, arr9?: any[] | undefined, arr10?: any[] | undefined) => {
-        $concatArrays: any[][];
+    concatArrays: (arr1: any | any[], arr2: any | any[], arr3?: any | any[], arr4?: any | any[], arr5?: any | any[], arr6?: any | any[], arr7?: any | any[], arr8?: any | any[], arr9?: any | any[], arr10?: any | any[]) => {
+        $concatArrays: any[];
     };
     /**
      * @method  accumulator Operator
