@@ -529,6 +529,22 @@ export default class AggregationBuilder {
   };
 
   /**
+   * @method count Stage
+   * Passes a document to the next stage that contains a count of the number of documents input to the stage.
+   * @type {String} - String
+   * @return this stage
+   */
+  count: (string: String, options?: Options) => AggregationBuilder = function (
+    string,
+    options
+  ) {
+    if (!this.openStage("count", options)) return this;
+    const stage = { $count: string };
+    this.closeStage(stage);
+    return this;
+  };
+
+  /**
    * @method skip Stage
    *Skips over the specified number of documents that pass into the stage and passes the remaining documents to the next stage in the pipeline.
    * @type {Number} - skip
@@ -695,7 +711,7 @@ export default class AggregationBuilder {
     try {
       if (!this.openStage("facet", options)) return this;
       const latestStage = this.aggs[this.aggs.length - 1];
-      if (latestStage.hasOwnProperty("$facet")) {
+      if (latestStage?.hasOwnProperty("$facet")) {
         Object.assign(latestStage.$facet, { [stage_name]: [] });
       } else {
         let stage: any;
