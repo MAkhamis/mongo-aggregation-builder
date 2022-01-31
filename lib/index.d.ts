@@ -280,7 +280,10 @@ export default class AggregationBuilder {
    * @return this stage
    */
   project: (projection: Project, options?: Options) => AggregationBuilder;
-  amendProject: (projection: Project, options?: amendOptions) => AggregationBuilder;
+  amendProject: (
+    projection: Project,
+    options?: amendOptions
+  ) => AggregationBuilder;
   /**
    * @method limit Stage
    * Limits the number of documents passed to the next stage in the pipeline.
@@ -288,6 +291,13 @@ export default class AggregationBuilder {
    * @return this stage
    */
   limit: (limit: Number, options?: Options) => AggregationBuilder;
+  /**
+   * @method count Stage
+   * Passes a document to the next stage that contains a count of the number of documents input to the stage.
+   * @type {String} - String
+   * @return this stage
+   */
+  count: (string: String, options?: Options) => AggregationBuilder;
   /**
    * @method skip Stage
    *Skips over the specified number of documents that pass into the stage and passes the remaining documents to the next stage in the pipeline.
@@ -319,7 +329,12 @@ export default class AggregationBuilder {
    * @type {[propName: string]: any} - Group.propName
    * @return this stage
    */
-  amendGroup: (id: any, arg: Group, lookup_arg?: Lookup, options?: amendOptions) => AggregationBuilder;
+  amendGroup: (
+    id: any,
+    arg: Group,
+    lookup_arg?: Lookup,
+    options?: amendOptions
+  ) => AggregationBuilder;
   /**
    * @method sort Stage
    * Sorts all input documents and returns them to the pipeline in sorted order.
@@ -362,7 +377,7 @@ export default class AggregationBuilder {
     format?: String | any,
     timezone?: string | any,
     onNull?: string | any,
-    options?: Options | undefined,
+    options?: Options | undefined
   ) => {
     $dateFromString: {
       dateString: string | any;
@@ -377,7 +392,13 @@ export default class AggregationBuilder {
    *  @type {Any} - newRoot
    * @return this stage
    */
-  reduceAndConcat: (input: string, initialValue: any, key?: string, condition?: any, options?: reduceAndConcatOptions) => any;
+  reduceAndConcat: (
+    input: string,
+    initialValue: any,
+    key?: string,
+    condition?: any,
+    options?: reduceAndConcatOptions
+  ) => any;
   /**
    * Concatenates strings and returns the concatenated string.
    * @method concat Operator
@@ -386,7 +407,7 @@ export default class AggregationBuilder {
    * @return This operator
    */
   concat: (
-    arr: any[],
+    arr: any[]
   ) => {
     $concat: any[];
   };
@@ -402,7 +423,7 @@ export default class AggregationBuilder {
   cond: (
     IF: any,
     THEN: any,
-    ELSE?: any,
+    ELSE?: any
   ) => {
     $cond: {
       if: any;
@@ -422,7 +443,7 @@ export default class AggregationBuilder {
    */
   eq: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $eq: any[];
   };
@@ -437,7 +458,7 @@ export default class AggregationBuilder {
    */
   ne: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $ne: any[];
   };
@@ -452,7 +473,7 @@ export default class AggregationBuilder {
   dateToString: (
     date: String | any,
     format?: any,
-    timezone?: String | undefined,
+    timezone?: String | undefined
   ) => {
     $dateToString: Res;
   };
@@ -466,7 +487,7 @@ export default class AggregationBuilder {
    */
   convert: (
     input: any,
-    to: String,
+    to: String
   ) => {
     $convert: Convert;
   };
@@ -479,7 +500,7 @@ export default class AggregationBuilder {
    * @return this Operator
    */
   toObjectId: (
-    arg: String,
+    arg: String
   ) => {
     $toObjectId: String;
   };
@@ -492,7 +513,7 @@ export default class AggregationBuilder {
    */
   year: (
     date: String,
-    timezone?: String | undefined,
+    timezone?: String | undefined
   ) => {
     $year: {
       date: String;
@@ -508,7 +529,7 @@ export default class AggregationBuilder {
    */
   week: (
     date: String,
-    timezone?: String | undefined,
+    timezone?: String | undefined
   ) => {
     $week: {
       date: String;
@@ -524,7 +545,7 @@ export default class AggregationBuilder {
    */
   month: (
     date: String,
-    timezone?: String | undefined,
+    timezone?: String | undefined
   ) => {
     $month: {
       date: String;
@@ -541,7 +562,7 @@ export default class AggregationBuilder {
    */
   dayOfMonth: (
     date: String,
-    timezone?: String | undefined,
+    timezone?: String | undefined
   ) => {
     $dayOfMonth: {
       date: String;
@@ -556,7 +577,7 @@ export default class AggregationBuilder {
    *
    */
   isArray: (
-    arg: any,
+    arg: any
   ) => {
     $isArray: any;
   };
@@ -596,7 +617,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   addToSet: (
-    key: any,
+    key: any
   ) => {
     $addToSet: any;
   };
@@ -607,7 +628,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   avg: (
-    key: any,
+    key: any
   ) => {
     $avg: any;
   };
@@ -618,7 +639,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   first: (
-    key: string | any,
+    key: string | any
   ) => {
     $first: any;
   };
@@ -629,7 +650,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   last: (
-    key: string,
+    key: string
   ) => {
     $last: string;
   };
@@ -640,7 +661,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   max: (
-    key: string,
+    key: string
   ) => {
     $max: string;
   };
@@ -651,7 +672,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   min: (
-    key: string,
+    key: string
   ) => {
     $min: string;
   };
@@ -662,7 +683,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   sum: (
-    data: string | Number | any[],
+    data: string | Number | any[]
   ) => {
     $sum: string | Number | any[];
   };
@@ -675,7 +696,7 @@ export default class AggregationBuilder {
    */
   multiply: (
     key1: string | number | any,
-    key2: string | number | any,
+    key2: string | number | any
   ) => {
     $multiply: any[];
   };
@@ -686,7 +707,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   in: (
-    key: any[],
+    key: any[]
   ) => {
     $in: any[];
   };
@@ -697,7 +718,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   size: (
-    key: any,
+    key: any
   ) => {
     $size: any;
   };
@@ -708,7 +729,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   mergeObjects: (
-    key: string | any[],
+    key: string | any[]
   ) => {
     $mergeObjects: string | any[];
   };
@@ -729,7 +750,7 @@ export default class AggregationBuilder {
     arr7?: any | any[],
     arr8?: any | any[],
     arr9?: any | any[],
-    arr10?: any | any[],
+    arr10?: any | any[]
   ) => {
     $concatArrays: any[];
   };
@@ -747,7 +768,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   accumulator: (
-    args: Accumulator,
+    args: Accumulator
   ) => {
     $accumulator: Accumulator;
   };
@@ -760,7 +781,7 @@ export default class AggregationBuilder {
    */
   round: (
     num: String | Number | any,
-    place: Number,
+    place: Number
   ) => {
     $round: any[];
   };
@@ -771,7 +792,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   pull: (
-    arg: any,
+    arg: any
   ) => {
     $pull: any;
   };
@@ -785,7 +806,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   reduce: (
-    arg: Reduce,
+    arg: Reduce
   ) => {
     $reduce: Reduce;
   };
@@ -799,7 +820,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   filter: (
-    arg: Filter,
+    arg: Filter
   ) => {
     $filter: Filter;
   };
@@ -810,7 +831,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   ifNull: (
-    expr: any[],
+    expr: any[]
   ) => {
     $ifNull: any[];
   };
@@ -821,7 +842,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   arrayElemAt: (
-    key: any[],
+    key: any[]
   ) => {
     $arrayElemAt: any[];
   };
@@ -833,7 +854,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   or: (
-    arg: any[],
+    arg: any[]
   ) => {
     $or: any[];
   };
@@ -845,7 +866,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   and: (
-    arg: any[],
+    arg: any[]
   ) => {
     $and: any[];
   };
@@ -858,7 +879,7 @@ export default class AggregationBuilder {
    */
   gt: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $gt: any[];
   };
@@ -871,7 +892,7 @@ export default class AggregationBuilder {
    */
   gte: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $gte: any[];
   };
@@ -886,7 +907,7 @@ export default class AggregationBuilder {
    */
   lt: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $lt: any[];
   };
@@ -901,7 +922,7 @@ export default class AggregationBuilder {
    */
   lte: (
     arg1: any,
-    arg2: any,
+    arg2: any
   ) => {
     $lte: any[];
   };
@@ -913,7 +934,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   push: (
-    arg: string | number[] | any,
+    arg: string | number[] | any
   ) => {
     $push: any;
   };
@@ -924,7 +945,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   expr: (
-    arg: any,
+    arg: any
   ) => {
     $expr: any;
   };
@@ -935,7 +956,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   strLenCP: (
-    expr: any,
+    expr: any
   ) => {
     $strLenCP: any;
   };
@@ -949,7 +970,7 @@ export default class AggregationBuilder {
      */
   subtract: (
     exp1: Number | String | any,
-    exp2: Number | String | any,
+    exp2: Number | String | any
   ) => {
     $subtract: any[];
   };
@@ -962,7 +983,7 @@ export default class AggregationBuilder {
    */
   divide: (
     exp1: Number | String | any,
-    exp2: Number | String | any,
+    exp2: Number | String | any
   ) => {
     $divide: any[];
   };
@@ -975,7 +996,7 @@ export default class AggregationBuilder {
    */
   add: (
     exp1: Number | String | any,
-    exp2: Number | String | any,
+    exp2: Number | String | any
   ) => {
     $add: any[];
   };
@@ -990,7 +1011,7 @@ export default class AggregationBuilder {
   function: (
     body: any,
     args: any[],
-    lang: string,
+    lang: string
   ) => {
     $function: {
       body: any;
@@ -1005,7 +1026,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   isNumber: (
-    arg: string | number,
+    arg: string | number
   ) => {
     $isNumber: string | number;
   };
@@ -1019,7 +1040,7 @@ export default class AggregationBuilder {
    */
   switch: (
     branches: any[],
-    arg?: string | any,
+    arg?: string | any
   ) => {
     $switch: {
       branches: any[];
@@ -1037,7 +1058,7 @@ export default class AggregationBuilder {
   map: (
     input: string,
     as?: string | undefined,
-    expr?: any,
+    expr?: any
   ) => {
     $map: {
       input: string;
@@ -1121,7 +1142,7 @@ export default class AggregationBuilder {
    * @returns this operator
    */
   anyElementTrue: (
-    expr: any[],
+    expr: any[]
   ) => {
     $anyElementTrue: any[];
   };
@@ -1155,7 +1176,7 @@ export default class AggregationBuilder {
   regexMatch: (
     input: string,
     regex: string,
-    options?: string | undefined,
+    options?: string | undefined
   ) => {
     $regexMatch: {
       input: string;
