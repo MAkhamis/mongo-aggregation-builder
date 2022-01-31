@@ -711,7 +711,7 @@ export default class AggregationBuilder {
     try {
       if (!this.openStage("facet", options)) return this;
       const latestStage = this.aggs[this.aggs.length - 1];
-      if (latestStage.hasOwnProperty("$facet")) {
+      if (latestStage?.hasOwnProperty("$facet")) {
         Object.assign(latestStage.$facet, { [stage_name]: [] });
       } else {
         let stage: any;
