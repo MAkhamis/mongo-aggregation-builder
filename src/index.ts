@@ -1226,8 +1226,29 @@ export default class AggregationBuilder {
    * @type {any[]} - arr2 ,
    * @returns this operator
    */
-  concatArrays = function (arr1: any[], arr2: any[]) {
-    return { $concatArrays: [arr1, arr2] };
+  concatArrays = function (
+    arr1: any | any[],
+    arr2: any | any[],
+    arr3?: any | any[],
+    arr4?: any | any[],
+    arr5?: any | any[],
+    arr6?: any | any[],
+    arr7?: any | any[],
+    arr8?: any | any[],
+    arr9?: any | any[],
+    arr10?: any | any[]
+  ) {
+    let arr = [arr1, arr2];
+    arr3 !== undefined ? arr.push(arr3) : 0;
+    arr4 !== undefined ? arr.push(arr4) : 0;
+    arr5 !== undefined ? arr.push(arr5) : 0;
+    arr6 !== undefined ? arr.push(arr6) : 0;
+    arr7 !== undefined ? arr.push(arr7) : 0;
+    arr8 !== undefined ? arr.push(arr8) : 0;
+    arr9 !== undefined ? arr.push(arr9) : 0;
+    arr10 !== undefined ? arr.push(arr10) : 0;
+
+    return { $concatArrays: arr };
   };
   /**
    * @method  accumulator Operator
@@ -1711,6 +1732,38 @@ export default class AggregationBuilder {
   setIntersection = function (expr: any[]): any {
     try {
       return { $setIntersection: expr };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+  /**
+   * @method  regexMatch  Operator
+   *Performs a regular expression (regex) pattern matching and returns: [true] if a match exists. [false] if a match doesn't exist.
+   * @type { string } - input - The string on which you wish to apply the regex pattern. Can be a string or any valid expression that resolves to a string.
+   * @type { string } - regex - The regex pattern to apply.
+   * @type { string } - options? - Optional. The following <options> are available for use with regular expression:
+   * [i] : Case insensitivity.
+   * [m] : For patterns that include anchors .
+   * [x] "Extended" capability to ignore all white space characters in the pattern unless escaped or included in a character class.
+   * [s] Allows the dot character.
+   * @returns this operator
+   *
+   */
+  regexMatch = function (input: string, regex: string, options?: string) {
+    try {
+      const stage = {
+        $regexMatch: {
+          input: `$${input}`,
+          regex: regex,
+          options: options,
+        },
+      };
+      if (options) {
+        stage.$regexMatch.options = options;
+      }
+      return stage;
     } catch (e) {
       console.error(e);
       throw e;
