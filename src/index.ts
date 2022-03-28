@@ -1251,6 +1251,38 @@ export default class AggregationBuilder {
     return { $concatArrays: arr };
   };
   /**
+   * @method setUnion Operator
+   * Takes two or more arrays and returns an array containing the elements that appear in any input array.
+   * @type {any[]} - arr1
+   * @type {any[]} - arr2 ,
+   * @type {any[]} - ...
+   * @returns this operator
+   */
+  setUnion = function (
+    arr1: any | any[],
+    arr2: any | any[],
+    arr3?: any | any[],
+    arr4?: any | any[],
+    arr5?: any | any[],
+    arr6?: any | any[],
+    arr7?: any | any[],
+    arr8?: any | any[],
+    arr9?: any | any[],
+    arr10?: any | any[]
+  ) {
+    let arr = [arr1, arr2];
+    arr3 !== undefined ? arr.push(arr3) : 0;
+    arr4 !== undefined ? arr.push(arr4) : 0;
+    arr5 !== undefined ? arr.push(arr5) : 0;
+    arr6 !== undefined ? arr.push(arr6) : 0;
+    arr7 !== undefined ? arr.push(arr7) : 0;
+    arr8 !== undefined ? arr.push(arr8) : 0;
+    arr9 !== undefined ? arr.push(arr9) : 0;
+    arr10 !== undefined ? arr.push(arr10) : 0;
+
+    return { $setUnion: arr };
+  };
+  /**
    * @method  accumulator Operator
    * Accumulators are operators that maintain their state as documents progress through the pipeline.
    * @type {Accumulator} - arg
