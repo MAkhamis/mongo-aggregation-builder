@@ -755,6 +755,28 @@ export default class AggregationBuilder {
     $concatArrays: any[];
   };
   /**
+   * @method setUnion Operator
+   * Takes two or more arrays and returns an array containing the elements that appear in any input array.
+   * @type {any[]} - arr1
+   * @type {any[]} - arr2 ,
+   * @type {any[]} - ...
+   * @returns this operator
+   */
+  setUnion: (
+    arr1: any | any[],
+    arr2: any | any[],
+    arr3?: any | any[],
+    arr4?: any | any[],
+    arr5?: any | any[],
+    arr6?: any | any[],
+    arr7?: any | any[],
+    arr8?: any | any[],
+    arr9?: any | any[],
+    arr10?: any | any[]
+  ) => {
+    $setUnion: any[];
+  };
+  /**
    * @method  accumulator Operator
    * Accumulators are operators that maintain their state as documents progress through the pipeline.
    * @type {Accumulator} - arg
