@@ -1206,5 +1206,13 @@ export default class AggregationBuilder {
       options: string | undefined;
     };
   };
+  /**
+   * @method  let  Operator
+   * Binds variables for use in the specified expression, and returns the result of the expression.
+   * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
+   * @type { Any } -
+   * @returns this operator
+   */
+  $let: (arg: { vars: any; in: any }) => any;
 }
 export {};
