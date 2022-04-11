@@ -1808,6 +1808,20 @@ export default class AggregationBuilder {
    * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
    * @type { Any } -
    * @returns this operator
+   * @example 
+   * {
+      $project: {
+         finalTotal: {
+            $let: {
+               vars: {
+                  total: { $add: [ '$price', '$tax' ] },
+                  discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
+               },
+               in: { $multiply: [ "$$total", "$$discounted" ] }
+            }
+         }
+      }
+   }
    */
   $let = function (arg: { vars: any; in: any }): any {
     try {

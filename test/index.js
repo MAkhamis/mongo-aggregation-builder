@@ -1,4 +1,4 @@
-import { AggregationBuilder } from "mongo-aggregation-builder";
+import AggregationBuilder from "./../src/index.js";
 const agg = new AggregationBuilder();
 
 // var _ = require('lodash');
