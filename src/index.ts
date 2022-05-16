@@ -239,12 +239,12 @@ interface reduceAndConcatOptions extends Options {
 }
 
 export default class AggregationBuilder {
-  opts: AggregationOptions = {
+  protected opts: AggregationOptions = {
     allowDiskUse: true,
     serializeFunctions: true,
   };
-  model: any;
-  aggs: any[] = [];
+  protected model: any;
+  protected aggs: any[] = [];
   option = function (options: AggregationOptions) {
     this.opts.allowDiskUse = options.allowDiskUse || true;
     this.opts.serializeFunctions = options.serializeFunctions || true;
@@ -359,7 +359,7 @@ export default class AggregationBuilder {
   };
   /**
    *  @method unwind Stage
-   * Filters the documents to pass only the documents that match the specified condition(s)Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
+   * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
    * @type {Unwind} - arg,
    * @type  {string} path - field path;
    * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
@@ -376,6 +376,28 @@ export default class AggregationBuilder {
      * @see Unwind
      */
     const stage = { $unwind: arg };
+    this.closeStage(stage);
+    return this;
+  };
+  /**
+   *  @method unset Stage
+   * The $unset operator deletes a particular field. Consider the following syntax:
+   *  { $unset: { <field1>: "", ... } }
+   *   The specified value in the $unset expression (i.e. "") does not impact the operation.
+   *  To specify a <field> in an embedded document or in an array,
+   * @type {string[]} - Fields
+   * @example [ "<field1>", "<field2>", ... ]
+   * @return this stage
+   */
+  unset: (arg: string[], options?: Options) => AggregationBuilder = function (
+    arg,
+    options
+  ) {
+    if (!this.openStage("unset", options)) return this;
+    /**
+     *
+     */
+    const stage = { $unset: arg };
     this.closeStage(stage);
     return this;
   };
