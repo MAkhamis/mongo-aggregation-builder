@@ -1198,7 +1198,7 @@ export default class AggregationBuilder {
    * @type {string|Number| any[]} - data
    * @returns this operator
    */
-  sum = function (data: string | Number | any[]) {
+  sum = function (data: string | Number | any[] | any) {
     return { $sum: data };
   };
   /**
