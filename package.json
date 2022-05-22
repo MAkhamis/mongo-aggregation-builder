@@ -9,7 +9,7 @@
     "email": "mohammad.khamis@repzoapp.com"
   },
   "contributors": [],
-  "main": "lib",
+  "main": "lib/index.js",
   "type": "module",
   "bugs": {},
   "directories": {},
