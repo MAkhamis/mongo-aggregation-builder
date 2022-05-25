@@ -771,7 +771,7 @@ export default class AggregationBuilder {
    *  The $search stage returns documents that match the specified search string.
    *  @type {Sort} - sortOrder
    * [1-->Sort ascending; -1-->Sort descending].
-   * @see Sort
+   * @see Search
    * @return this stage
    */
   search: (
@@ -779,7 +779,7 @@ export default class AggregationBuilder {
     options?: Options
   ) => AggregationBuilder = function (SearchComponents, options) {
     if (!this.openStage("search", options)) return this;
-    const stage = { $earch: SearchComponents };
+    const stage = { $search: SearchComponents };
     this.closeStage(stage);
     return this;
   };
