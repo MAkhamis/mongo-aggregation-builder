@@ -228,6 +228,66 @@ interface Sort {
   [propName: string]: Number;
 }
 
+interface Search extends SearchComponent {
+  /**
+   * @example
+   *   { $Search: {
+    compound: {
+      should: [
+        {
+          autocomplete: {
+            query: "A112m",
+            path: "name",
+            score: { boost: { value: 3 } },
+          },
+        },
+        {
+          text: {
+            query: "A11",
+            path: "client_code",
+            score: { boost: { value: 2 } },
+          },
+        },
+      ],
+    },
+  },
+}; }
+   */
+  compound: { should: SearchComponent[] };
+}
+interface SearchComponent {
+  index?: string; // optional, defaults to "default"
+  autocomplete?: {
+    query: string;
+    path: string | { wildcard?: string };
+    tokenOrder?: "any" | "sequential";
+    fuzzy?: {
+      maxEdits?: number; // defaults to 2
+      prefixLength?: number; // defaults to 0
+      maxExpansions?: number; // defaults to 50
+    };
+    score?: {
+      boost?: number;
+      constant?: number;
+    };
+  };
+  text?: {
+    query: string;
+    path: string | { wildcard?: string };
+    tokenOrder?: "any" | "sequential";
+    fuzzy?: {
+      maxEdits?: number; // defaults to 2
+      prefixLength?: number; // defaults to 0
+      maxExpansions?: number; // defaults to 50
+    };
+    score?: {
+      boost?: number;
+      constant?: number;
+    };
+    synonyms?: string;
+  };
+}
+
 interface amendOptions extends Options {
   applyLookup?: boolean;
   lookupOptions?: Options;
@@ -702,6 +762,24 @@ export default class AggregationBuilder {
   ) {
     if (!this.openStage("sort", options)) return this;
     const stage = { $sort: sortOrder };
+    this.closeStage(stage);
+    return this;
+  };
+  /**
+   * @method search Stage
+   * searches using the lucsene $search index, uses deafult index (whcih must be created ) unles index is specified.
+   *  The $search stage returns documents that match the specified search string.
+   *  @type {Sort} - sortOrder
+   * [1-->Sort ascending; -1-->Sort descending].
+   * @see Sort
+   * @return this stage
+   */
+  search: (
+    sortOrder: Search,
+    options?: Options
+  ) => AggregationBuilder = function (SearchComponents, options) {
+    if (!this.openStage("search", options)) return this;
+    const stage = { $earch: SearchComponents };
     this.closeStage(stage);
     return this;
   };

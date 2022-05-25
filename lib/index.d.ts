@@ -211,6 +211,71 @@ interface Sort {
      */
     [propName: string]: Number;
 }
+interface Search extends SearchComponent {
+    /**
+     * @example
+     *   { $Search: {
+      compound: {
+        should: [
+          {
+            autocomplete: {
+              query: "A112m",
+              path: "name",
+              score: { boost: { value: 3 } },
+            },
+          },
+          {
+            text: {
+              query: "A11",
+              path: "client_code",
+              score: { boost: { value: 2 } },
+            },
+          },
+        ],
+      },
+    },
+  }; }
+     */
+    compound: {
+        should: SearchComponent[];
+    };
+}
+interface SearchComponent {
+    index?: string;
+    autocomplete?: {
+        query: string;
+        path: string | {
+            wildcard?: string;
+        };
+        tokenOrder?: "any" | "sequential";
+        fuzzy?: {
+            maxEdits?: number;
+            prefixLength?: number;
+            maxExpansions?: number;
+        };
+        score?: {
+            boost?: number;
+            constant?: number;
+        };
+    };
+    text?: {
+        query: string;
+        path: string | {
+            wildcard?: string;
+        };
+        tokenOrder?: "any" | "sequential";
+        fuzzy?: {
+            maxEdits?: number;
+            prefixLength?: number;
+            maxExpansions?: number;
+        };
+        score?: {
+            boost?: number;
+            constant?: number;
+        };
+        synonyms?: string;
+    };
+}
 interface amendOptions extends Options {
     applyLookup?: boolean;
     lookupOptions?: Options;
@@ -347,6 +412,16 @@ export default class AggregationBuilder {
      * @return this stage
      */
     sort: (sortOrder: Sort, options?: Options) => AggregationBuilder;
+    /**
+     * @method search Stage
+     * searches using the lucsene $search index, uses deafult index (whcih must be created ) unles index is specified.
+     *  The $search stage returns documents that match the specified search string.
+     *  @type {Sort} - sortOrder
+     * [1-->Sort ascending; -1-->Sort descending].
+     * @see Sort
+     * @return this stage
+     */
+    search: (sortOrder: Search, options?: Options) => AggregationBuilder;
     /**
      * @method facet Stage
      * Processes multiple aggregation pipelines within a single stage on the same set of input documents.
