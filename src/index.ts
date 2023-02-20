@@ -71,16 +71,17 @@ interface Res {
 interface Convert {
   input: any;
   to: String;
+  onError?: any;
 }
 interface Facet {
   /**
-* @example   
-*  {
-    <outputField1>: [ <stage1>, <stage2>, ... ],
-    <outputField2>: [ <stage1>, <stage2>, ... ],
-    ...
- }
-*/
+  * @example   
+  *  {
+      <outputField1>: [ <stage1>, <stage2>, ... ],
+      <outputField2>: [ <stage1>, <stage2>, ... ],
+      ...
+   }
+  */
   [propName: string]: any[];
 }
 
@@ -118,14 +119,14 @@ interface Match {
 
 interface Group {
   /**
-* @type {string|null|any} _id
-* @example
-*   {
-    _id: <expression>, // Group By Expression
-    <field1>: { <accumulator1> : <expression1> },
-    ...
-  }
-*/
+  * @type {string|null|any} _id
+  * @example
+  *   {
+      _id: <expression>, // Group By Expression
+      <field1>: { <accumulator1> : <expression1> },
+      ...
+    }
+  */
   _id?: string | null | any;
   [propName: string]: any;
 }
@@ -144,13 +145,13 @@ interface Accumulator {
    */
   initArgs?: any[];
   /**
-   * @type {any}  accumulate - Function used to accumulate documents.
-   * @example
-   *  function(state, <accumArg1>, <accumArg2>, ...) {
-   * ...
- * return <newState>
-}
-   */
+     * @type {any}  accumulate - Function used to accumulate documents.
+     * @example
+     *  function(state, <accumArg1>, <accumArg2>, ...) {
+     * ...
+   * return <newState>
+  }
+     */
   accumulate: any;
   /**
    * @type {any}  accumulateArgs - Arguments passed to the accumulate function
@@ -230,29 +231,29 @@ interface Sort {
 
 interface Search extends SearchComponent {
   /**
-   * @example
-   *   { $Search: {
-    compound: {
-      should: [
-        {
-          autocomplete: {
-            query: "A112m",
-            path: "name",
-            score: { boost: { value: 3 } },
+     * @example
+     *   { $Search: {
+      compound: {
+        should: [
+          {
+            autocomplete: {
+              query: "A112m",
+              path: "name",
+              score: { boost: { value: 3 } },
+            },
           },
-        },
-        {
-          text: {
-            query: "A11",
-            path: "client_code",
-            score: { boost: { value: 2 } },
+          {
+            text: {
+              query: "A11",
+              path: "client_code",
+              score: { boost: { value: 2 } },
+            },
           },
-        },
-      ],
+        ],
+      },
     },
-  },
-}; }
-   */
+  }; }
+     */
   compound: { should: SearchComponent[] };
 }
 interface SearchComponent {
@@ -418,15 +419,15 @@ export default class AggregationBuilder {
     return this;
   };
   /**
-   *  @method unwind Stage
-   * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
-   * @type {Unwind} - arg,
-   * @type  {string} path - field path;
-   * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
-   * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document. 
-  If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
-   * @return this stage
-   */
+     *  @method unwind Stage
+     * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
+     * @type {Unwind} - arg,
+     * @type  {string} path - field path;
+     * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
+     * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document. 
+    If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
+     * @return this stage
+     */
   unwind: (arg: Unwind, options?: Options) => AggregationBuilder = function (
     arg,
     options
@@ -522,18 +523,16 @@ export default class AggregationBuilder {
    * @type {[propName: string]: string | any} - fields,
    * @return this stage
    */
-  addFields: (
-    fields: AddFields,
-    options?: Options
-  ) => AggregationBuilder = function (fields, options) {
-    if (!this.openStage("addFields", options)) return this;
-    /**
-     * @see AddFields
-     */
-    const stage = { $addFields: fields };
-    this.closeStage(stage);
-    return this;
-  };
+  addFields: (fields: AddFields, options?: Options) => AggregationBuilder =
+    function (fields, options) {
+      if (!this.openStage("addFields", options)) return this;
+      /**
+       * @see AddFields
+       */
+      const stage = { $addFields: fields };
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method project Stage
    * specified fields can be existing fields from the input documents or newly computed fields.
@@ -667,29 +666,26 @@ export default class AggregationBuilder {
    * @type {[propName: string]: any} - Group.propName
    * @return this stage
    */
-  group: (
-    id: any,
-    arg: Group,
-    options?: Options
-  ) => AggregationBuilder = function (id, arg, options) {
-    if (!this.openStage("group", options)) return this;
-    let stage: any;
-    /**
-     * @see Group
-     *
-     */
-    stage = { $group: arg };
-    stage.$group._id = id;
-    if (options?.checkLookup?.length) {
-      options.checkLookup.forEach((key) => {
-        if (stage.$group._id[key]) {
-          stage.$group._id[key] = `${stage.$group._id[key]}._id`;
-        }
-      });
-    }
-    this.closeStage(stage);
-    return this;
-  };
+  group: (id: any, arg: Group, options?: Options) => AggregationBuilder =
+    function (id, arg, options) {
+      if (!this.openStage("group", options)) return this;
+      let stage: any;
+      /**
+       * @see Group
+       *
+       */
+      stage = { $group: arg };
+      stage.$group._id = id;
+      if (options?.checkLookup?.length) {
+        options.checkLookup.forEach((key) => {
+          if (stage.$group._id[key]) {
+            stage.$group._id[key] = `${stage.$group._id[key]}._id`;
+          }
+        });
+      }
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method amendGroup Stage
    * *****
@@ -774,15 +770,13 @@ export default class AggregationBuilder {
    * @see Search
    * @return this stage
    */
-  search: (
-    sortOrder: Search,
-    options?: Options
-  ) => AggregationBuilder = function (SearchComponents, options) {
-    if (!this.openStage("search", options)) return this;
-    const stage = { $search: SearchComponents };
-    this.closeStage(stage);
-    return this;
-  };
+  search: (sortOrder: Search, options?: Options) => AggregationBuilder =
+    function (SearchComponents, options) {
+      if (!this.openStage("search", options)) return this;
+      const stage = { $search: SearchComponents };
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method facet Stage
    * Processes multiple aggregation pipelines within a single stage on the same set of input documents.
@@ -1082,11 +1076,14 @@ export default class AggregationBuilder {
    * @return this operator
    *
    */
-  convert = function (input: any, to: String) {
+  convert = function (input: any, to: String, onError?: any) {
     let data: Convert = {
       input: input,
       to: to,
     };
+    if (onError) {
+      data.onError = onError;
+    }
     return { $convert: data };
   };
   /**
@@ -1589,13 +1586,13 @@ export default class AggregationBuilder {
     return { $strLenCP: expr };
   };
   /**
-   * @method  subtract  Operator
-   * Subtracts two numbers to return the difference
-   * @type {Number | String | Any} - exp1
-   * @type {Number | String | Any} - exp2
-
-   * @returns this operator
-   */
+     * @method  subtract  Operator
+     * Subtracts two numbers to return the difference
+     * @type {Number | String | Any} - exp1
+     * @type {Number | String | Any} - exp2
+  
+     * @returns this operator
+     */
   subtract = function (
     exp1: Number | String | any,
     exp2: Number | String | any
@@ -1903,26 +1900,26 @@ export default class AggregationBuilder {
   };
 
   /**
-   * @method  let  Operator
-   * Binds variables for use in the specified expression, and returns the result of the expression.
-   * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
-   * @type { Any } -
-   * @returns this operator
-   * @example 
-   * {
-      $project: {
-         finalTotal: {
-            $let: {
-               vars: {
-                  total: { $add: [ '$price', '$tax' ] },
-                  discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
-               },
-               in: { $multiply: [ "$$total", "$$discounted" ] }
-            }
-         }
-      }
-   }
-   */
+     * @method  let  Operator
+     * Binds variables for use in the specified expression, and returns the result of the expression.
+     * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
+     * @type { Any } -
+     * @returns this operator
+     * @example 
+     * {
+        $project: {
+           finalTotal: {
+              $let: {
+                 vars: {
+                    total: { $add: [ '$price', '$tax' ] },
+                    discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
+                 },
+                 in: { $multiply: [ "$$total", "$$discounted" ] }
+              }
+           }
+        }
+     }
+     */
   $let = function (arg: { vars: any; in: any }): any {
     try {
       return { $let: arg };

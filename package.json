@@ -1,7 +1,7 @@
 {
   "name": "mongo-aggregation-builder",
   "description": "Mongo Aggregation Builder",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "homepage": "",
   "keywords": [],
   "author": {
