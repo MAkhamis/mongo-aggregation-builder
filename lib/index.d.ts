@@ -70,13 +70,13 @@ interface Convert {
 }
 interface Facet {
   /**
-    * @example
-    *  {
-        <outputField1>: [ <stage1>, <stage2>, ... ],
-        <outputField2>: [ <stage1>, <stage2>, ... ],
-        ...
-     }
-    */
+      * @example
+      *  {
+          <outputField1>: [ <stage1>, <stage2>, ... ],
+          <outputField2>: [ <stage1>, <stage2>, ... ],
+          ...
+       }
+      */
   [propName: string]: any[];
 }
 interface AddFields {
@@ -109,14 +109,14 @@ interface Match {
 }
 interface Group {
   /**
-    * @type {string|null|any} _id
-    * @example
-    *   {
-        _id: <expression>, // Group By Expression
-        <field1>: { <accumulator1> : <expression1> },
-        ...
-      }
-    */
+      * @type {string|null|any} _id
+      * @example
+      *   {
+          _id: <expression>, // Group By Expression
+          <field1>: { <accumulator1> : <expression1> },
+          ...
+        }
+      */
   _id?: string | null | any;
   [propName: string]: any;
 }
@@ -134,13 +134,13 @@ interface Accumulator {
    */
   initArgs?: any[];
   /**
-       * @type {any}  accumulate - Function used to accumulate documents.
-       * @example
-       *  function(state, <accumArg1>, <accumArg2>, ...) {
-       * ...
-     * return <newState>
-    }
-       */
+         * @type {any}  accumulate - Function used to accumulate documents.
+         * @example
+         *  function(state, <accumArg1>, <accumArg2>, ...) {
+         * ...
+       * return <newState>
+      }
+         */
   accumulate: any;
   /**
    * @type {any}  accumulateArgs - Arguments passed to the accumulate function
@@ -214,29 +214,29 @@ interface Sort {
 }
 interface Search extends SearchComponent {
   /**
-       * @example
-       *   { $Search: {
-        compound: {
-          should: [
-            {
-              autocomplete: {
-                query: "A112m",
-                path: "name",
-                score: { boost: { value: 3 } },
+         * @example
+         *   { $Search: {
+          compound: {
+            should: [
+              {
+                autocomplete: {
+                  query: "A112m",
+                  path: "name",
+                  score: { boost: { value: 3 } },
+                },
               },
-            },
-            {
-              text: {
-                query: "A11",
-                path: "client_code",
-                score: { boost: { value: 2 } },
+              {
+                text: {
+                  query: "A11",
+                  path: "client_code",
+                  score: { boost: { value: 2 } },
+                },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-    }; }
-       */
+      }; }
+         */
   compound: {
     should: SearchComponent[];
   };
@@ -312,15 +312,15 @@ export default class AggregationBuilder {
    */
   lookup: (arg: Lookup, options?: Options) => AggregationBuilder;
   /**
-       *  @method unwind Stage
-       * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
-       * @type {Unwind} - arg,
-       * @type  {string} path - field path;
-       * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
-       * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document.
-      If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
-       * @return this stage
-       */
+         *  @method unwind Stage
+         * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
+         * @type {Unwind} - arg,
+         * @type  {string} path - field path;
+         * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
+         * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document.
+        If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
+         * @return this stage
+         */
   unwind: (arg: Unwind, options?: Options) => AggregationBuilder;
   /**
    *  @method unset Stage
@@ -468,7 +468,7 @@ export default class AggregationBuilder {
     format?: String | any,
     timezone?: string | any,
     onNull?: string | any,
-    options?: Options
+    options?: Options | undefined
   ) => {
     $dateFromString: {
       dateString: string | any;
@@ -497,7 +497,9 @@ export default class AggregationBuilder {
    *  can be any valid expression as long as they resolve to strings.
    * @return This operator
    */
-  concat: (arr: any[]) => {
+  concat: (
+    arr: any[]
+  ) => {
     $concat: any[];
   };
   /**
@@ -562,7 +564,7 @@ export default class AggregationBuilder {
   dateToString: (
     date: String | any,
     format?: any,
-    timezone?: String
+    timezone?: String | undefined
   ) => {
     $dateToString: Res;
   };
@@ -589,7 +591,9 @@ export default class AggregationBuilder {
    * @type {string} arg - string of length 24.
    * @return this Operator
    */
-  toObjectId: (arg: String) => {
+  toObjectId: (
+    arg: String
+  ) => {
     $toObjectId: String;
   };
   /**
@@ -601,7 +605,7 @@ export default class AggregationBuilder {
    */
   year: (
     date: String,
-    timezone?: String
+    timezone?: String | undefined
   ) => {
     $year: {
       date: String;
@@ -617,7 +621,7 @@ export default class AggregationBuilder {
    */
   week: (
     date: String,
-    timezone?: String
+    timezone?: String | undefined
   ) => {
     $week: {
       date: String;
@@ -633,7 +637,7 @@ export default class AggregationBuilder {
    */
   month: (
     date: String,
-    timezone?: String
+    timezone?: String | undefined
   ) => {
     $month: {
       date: String;
@@ -650,7 +654,7 @@ export default class AggregationBuilder {
    */
   dayOfMonth: (
     date: String,
-    timezone?: String
+    timezone?: String | undefined
   ) => {
     $dayOfMonth: {
       date: String;
@@ -664,7 +668,9 @@ export default class AggregationBuilder {
    * @return this Operator
    *
    */
-  isArray: (arg: any) => {
+  isArray: (
+    arg: any
+  ) => {
     $isArray: any;
   };
   /**
@@ -678,7 +684,7 @@ export default class AggregationBuilder {
    * @type {Number|null} - d
    * @returns console.dir(this.aggs,{depth:depth|null})
    */
-  show: (d?: Number) => any;
+  show: (d?: Number | undefined) => any;
   /**
    * @method alone Operator
    * @type {String} - key
@@ -702,7 +708,9 @@ export default class AggregationBuilder {
    * @type {*} - key
    * @returns this operator
    */
-  addToSet: (key: any) => {
+  addToSet: (
+    key: any
+  ) => {
     $addToSet: any;
   };
   /**
@@ -711,7 +719,9 @@ export default class AggregationBuilder {
    * @type {*} - key
    * @returns this operator
    */
-  avg: (key: any) => {
+  avg: (
+    key: any
+  ) => {
     $avg: any;
   };
   /**
@@ -720,7 +730,9 @@ export default class AggregationBuilder {
    * @type {string | any} - key
    * @returns this operator
    */
-  first: (key: string | any) => {
+  first: (
+    key: string | any
+  ) => {
     $first: any;
   };
   /**
@@ -729,7 +741,9 @@ export default class AggregationBuilder {
    * @type {string} - key
    * @returns this operator
    */
-  last: (key: string) => {
+  last: (
+    key: string
+  ) => {
     $last: string;
   };
   /**
@@ -738,7 +752,9 @@ export default class AggregationBuilder {
    * @type {string} - key
    * @returns this operator
    */
-  max: (key: string) => {
+  max: (
+    key: string
+  ) => {
     $max: string;
   };
   /**
@@ -747,7 +763,9 @@ export default class AggregationBuilder {
    * @type {string} - key
    * @returns this operator
    */
-  min: (key: string) => {
+  min: (
+    key: string
+  ) => {
     $min: string;
   };
   /**
@@ -756,7 +774,9 @@ export default class AggregationBuilder {
    * @type {string|Number| any[]} - data
    * @returns this operator
    */
-  sum: (data: string | Number | any[] | any) => {
+  sum: (
+    data: string | Number | any[] | any
+  ) => {
     $sum: any;
   };
   /**
@@ -778,7 +798,9 @@ export default class AggregationBuilder {
    * @type {any[]} - key
    * @returns this operator
    */
-  in: (key: any[]) => {
+  in: (
+    key: any[]
+  ) => {
     $in: any[];
   };
   /**
@@ -787,7 +809,9 @@ export default class AggregationBuilder {
    * @type {any} - key
    * @returns this operator
    */
-  size: (key: any) => {
+  size: (
+    key: any
+  ) => {
     $size: any;
   };
   /**
@@ -796,7 +820,9 @@ export default class AggregationBuilder {
    * @type {string|any[]} - key
    * @returns this operator
    */
-  mergeObjects: (key: string | any[]) => {
+  mergeObjects: (
+    key: string | any[]
+  ) => {
     $mergeObjects: string | any[];
   };
   /**
@@ -855,7 +881,9 @@ export default class AggregationBuilder {
    * @type {lang: string} - Accumulator.lang
    * @returns this operator
    */
-  accumulator: (args: Accumulator) => {
+  accumulator: (
+    args: Accumulator
+  ) => {
     $accumulator: Accumulator;
   };
   /**
@@ -877,7 +905,9 @@ export default class AggregationBuilder {
    * @type {*} - arg
    * @returns this operator
    */
-  pull: (arg: any) => {
+  pull: (
+    arg: any
+  ) => {
     $pull: any;
   };
   /**
@@ -889,7 +919,9 @@ export default class AggregationBuilder {
    * @type {in: any} - Reduce.in
    * @returns this operator
    */
-  reduce: (arg: Reduce) => {
+  reduce: (
+    arg: Reduce
+  ) => {
     $reduce: Reduce;
   };
   /**
@@ -901,7 +933,9 @@ export default class AggregationBuilder {
    * @type {cond: any } - Filter.cond
    * @returns this operator
    */
-  filter: (arg: Filter) => {
+  filter: (
+    arg: Filter
+  ) => {
     $filter: Filter;
   };
   /**
@@ -910,7 +944,9 @@ export default class AggregationBuilder {
    * @type {any[] }-arg
    * @returns this operator
    */
-  ifNull: (expr: any[]) => {
+  ifNull: (
+    expr: any[]
+  ) => {
     $ifNull: any[];
   };
   /**
@@ -919,7 +955,9 @@ export default class AggregationBuilder {
    * @type {any[] } - arg
    * @returns this operator
    */
-  arrayElemAt: (key: any[]) => {
+  arrayElemAt: (
+    key: any[]
+  ) => {
     $arrayElemAt: any[];
   };
   /**
@@ -929,7 +967,9 @@ export default class AggregationBuilder {
    * @type {any} - arg
    * @returns this operator
    */
-  or: (arg: any[]) => {
+  or: (
+    arg: any[]
+  ) => {
     $or: any[];
   };
   /**
@@ -939,7 +979,9 @@ export default class AggregationBuilder {
    * @type {any} - arg
    * @returns this operator
    */
-  and: (arg: any[]) => {
+  and: (
+    arg: any[]
+  ) => {
     $and: any[];
   };
   /**
@@ -1005,7 +1047,9 @@ export default class AggregationBuilder {
    * @type { string|number[]} - arg
    * @returns this operator
    */
-  push: (arg: string | number[] | any) => {
+  push: (
+    arg: string | number[] | any
+  ) => {
     $push: any;
   };
   /**
@@ -1014,7 +1058,9 @@ export default class AggregationBuilder {
    * @type { any} - arg
    * @returns this operator
    */
-  expr: (arg: any) => {
+  expr: (
+    arg: any
+  ) => {
     $expr: any;
   };
   /**
@@ -1023,17 +1069,19 @@ export default class AggregationBuilder {
    * @type {Any} - expression or string
    * @returns this operator
    */
-  strLenCP: (expr: any) => {
+  strLenCP: (
+    expr: any
+  ) => {
     $strLenCP: any;
   };
   /**
-       * @method  subtract  Operator
-       * Subtracts two numbers to return the difference
-       * @type {Number | String | Any} - exp1
-       * @type {Number | String | Any} - exp2
-    
-       * @returns this operator
-       */
+         * @method  subtract  Operator
+         * Subtracts two numbers to return the difference
+         * @type {Number | String | Any} - exp1
+         * @type {Number | String | Any} - exp2
+      
+         * @returns this operator
+         */
   subtract: (
     exp1: Number | String | any,
     exp2: Number | String | any
@@ -1091,7 +1139,9 @@ export default class AggregationBuilder {
    * @type {string | number} - arg
    * @returns this operator
    */
-  isNumber: (arg: string | number) => {
+  isNumber: (
+    arg: string | number
+  ) => {
     $isNumber: string | number;
   };
   /**
@@ -1121,7 +1171,7 @@ export default class AggregationBuilder {
    */
   map: (
     input: string,
-    as?: string,
+    as?: string | undefined,
     expr?: any
   ) => {
     $map: {
@@ -1205,7 +1255,9 @@ export default class AggregationBuilder {
    * @type { Any[] } - expr -itself must resolve to an array
    * @returns this operator
    */
-  anyElementTrue: (expr: any[]) => {
+  anyElementTrue: (
+    expr: any[]
+  ) => {
     $anyElementTrue: any[];
   };
   /**
@@ -1238,7 +1290,7 @@ export default class AggregationBuilder {
   regexMatch: (
     input: string,
     regex: string,
-    options?: string
+    options?: string | undefined
   ) => {
     $regexMatch: {
       input: string;
@@ -1247,26 +1299,26 @@ export default class AggregationBuilder {
     };
   };
   /**
-       * @method  let  Operator
-       * Binds variables for use in the specified expression, and returns the result of the expression.
-       * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
-       * @type { Any } -
-       * @returns this operator
-       * @example
-       * {
-          $project: {
-             finalTotal: {
-                $let: {
-                   vars: {
-                      total: { $add: [ '$price', '$tax' ] },
-                      discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
-                   },
-                   in: { $multiply: [ "$$total", "$$discounted" ] }
-                }
-             }
-          }
-       }
-       */
+         * @method  let  Operator
+         * Binds variables for use in the specified expression, and returns the result of the expression.
+         * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
+         * @type { Any } -
+         * @returns this operator
+         * @example
+         * {
+            $project: {
+               finalTotal: {
+                  $let: {
+                     vars: {
+                        total: { $add: [ '$price', '$tax' ] },
+                        discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
+                     },
+                     in: { $multiply: [ "$$total", "$$discounted" ] }
+                  }
+               }
+            }
+         }
+         */
   $let: (arg: { vars: any; in: any }) => any;
 }
 export {};
