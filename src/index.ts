@@ -387,8 +387,8 @@ export default class AggregationBuilder {
       stage.$lookup.let = arg.let;
       stage.$lookup.pipeline = arg.pipeline || [];
       stage.$lookup.as = arg.as || arg.as;
-      stage.$lookup.localField = arg.localField;
-      stage.$lookup.foreignField = arg.foreignField;
+      if (arg.localField) stage.$lookup.localField = arg.localField;
+      if (arg.foreignField) stage.$lookup.foreignField = arg.foreignField;
       this.closeStage(stage);
     } else if (arg && arg.localField) {
       /**
@@ -525,18 +525,16 @@ export default class AggregationBuilder {
    * @type {[propName: string]: string | any} - fields,
    * @return this stage
    */
-  addFields: (
-    fields: AddFields,
-    options?: Options
-  ) => AggregationBuilder = function (fields, options) {
-    if (!this.openStage("addFields", options)) return this;
-    /**
-     * @see AddFields
-     */
-    const stage = { $addFields: fields };
-    this.closeStage(stage);
-    return this;
-  };
+  addFields: (fields: AddFields, options?: Options) => AggregationBuilder =
+    function (fields, options) {
+      if (!this.openStage("addFields", options)) return this;
+      /**
+       * @see AddFields
+       */
+      const stage = { $addFields: fields };
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method project Stage
    * specified fields can be existing fields from the input documents or newly computed fields.
@@ -670,29 +668,26 @@ export default class AggregationBuilder {
    * @type {[propName: string]: any} - Group.propName
    * @return this stage
    */
-  group: (
-    id: any,
-    arg: Group,
-    options?: Options
-  ) => AggregationBuilder = function (id, arg, options) {
-    if (!this.openStage("group", options)) return this;
-    let stage: any;
-    /**
-     * @see Group
-     *
-     */
-    stage = { $group: arg };
-    stage.$group._id = id;
-    if (options?.checkLookup?.length) {
-      options.checkLookup.forEach((key) => {
-        if (stage.$group._id[key]) {
-          stage.$group._id[key] = `${stage.$group._id[key]}._id`;
-        }
-      });
-    }
-    this.closeStage(stage);
-    return this;
-  };
+  group: (id: any, arg: Group, options?: Options) => AggregationBuilder =
+    function (id, arg, options) {
+      if (!this.openStage("group", options)) return this;
+      let stage: any;
+      /**
+       * @see Group
+       *
+       */
+      stage = { $group: arg };
+      stage.$group._id = id;
+      if (options?.checkLookup?.length) {
+        options.checkLookup.forEach((key) => {
+          if (stage.$group._id[key]) {
+            stage.$group._id[key] = `${stage.$group._id[key]}._id`;
+          }
+        });
+      }
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method amendGroup Stage
    * *****
@@ -777,15 +772,13 @@ export default class AggregationBuilder {
    * @see Search
    * @return this stage
    */
-  search: (
-    sortOrder: Search,
-    options?: Options
-  ) => AggregationBuilder = function (SearchComponents, options) {
-    if (!this.openStage("search", options)) return this;
-    const stage = { $search: SearchComponents };
-    this.closeStage(stage);
-    return this;
-  };
+  search: (sortOrder: Search, options?: Options) => AggregationBuilder =
+    function (SearchComponents, options) {
+      if (!this.openStage("search", options)) return this;
+      const stage = { $search: SearchComponents };
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method facet Stage
    * Processes multiple aggregation pipelines within a single stage on the same set of input documents.
