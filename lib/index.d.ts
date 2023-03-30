@@ -50,6 +50,16 @@ interface Lookup {
    */
   as?: String;
 }
+interface UnionWith {
+  /**
+   * @type  {String}  from - "required", collection to join,
+   */
+  coll: String;
+  /**
+   * @type  {any} pipeline - "required" [ the aggregation pipeline to apply to the unioned collection. ],
+   */
+  pipeline?: any[];
+}
 interface Res {
   /**
    *  @type {string} date -The date to convert to string.must be a valid expression that resolves to a Date, a Timestamp, or an ObjectID.
@@ -70,13 +80,13 @@ interface Convert {
 }
 interface Facet {
   /**
-      * @example
-      *  {
-          <outputField1>: [ <stage1>, <stage2>, ... ],
-          <outputField2>: [ <stage1>, <stage2>, ... ],
-          ...
-       }
-      */
+        * @example
+        *  {
+            <outputField1>: [ <stage1>, <stage2>, ... ],
+            <outputField2>: [ <stage1>, <stage2>, ... ],
+            ...
+         }
+        */
   [propName: string]: any[];
 }
 interface AddFields {
@@ -109,14 +119,14 @@ interface Match {
 }
 interface Group {
   /**
-      * @type {string|null|any} _id
-      * @example
-      *   {
-          _id: <expression>, // Group By Expression
-          <field1>: { <accumulator1> : <expression1> },
-          ...
-        }
-      */
+        * @type {string|null|any} _id
+        * @example
+        *   {
+            _id: <expression>, // Group By Expression
+            <field1>: { <accumulator1> : <expression1> },
+            ...
+          }
+        */
   _id?: string | null | any;
   [propName: string]: any;
 }
@@ -134,13 +144,13 @@ interface Accumulator {
    */
   initArgs?: any[];
   /**
-         * @type {any}  accumulate - Function used to accumulate documents.
-         * @example
-         *  function(state, <accumArg1>, <accumArg2>, ...) {
-         * ...
-       * return <newState>
-      }
-         */
+           * @type {any}  accumulate - Function used to accumulate documents.
+           * @example
+           *  function(state, <accumArg1>, <accumArg2>, ...) {
+           * ...
+         * return <newState>
+        }
+           */
   accumulate: any;
   /**
    * @type {any}  accumulateArgs - Arguments passed to the accumulate function
@@ -214,29 +224,29 @@ interface Sort {
 }
 interface Search extends SearchComponent {
   /**
-         * @example
-         *   { $Search: {
-          compound: {
-            should: [
-              {
-                autocomplete: {
-                  query: "A112m",
-                  path: "name",
-                  score: { boost: { value: 3 } },
+           * @example
+           *   { $Search: {
+            compound: {
+              should: [
+                {
+                  autocomplete: {
+                    query: "A112m",
+                    path: "name",
+                    score: { boost: { value: 3 } },
+                  },
                 },
-              },
-              {
-                text: {
-                  query: "A11",
-                  path: "client_code",
-                  score: { boost: { value: 2 } },
+                {
+                  text: {
+                    query: "A11",
+                    path: "client_code",
+                    score: { boost: { value: 2 } },
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
-        },
-      }; }
-         */
+        }; }
+           */
   compound: {
     should: SearchComponent[];
   };
@@ -312,15 +322,27 @@ export default class AggregationBuilder {
    */
   lookup: (arg: Lookup, options?: Options) => AggregationBuilder;
   /**
-         *  @method unwind Stage
-         * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
-         * @type {Unwind} - arg,
-         * @type  {string} path - field path;
-         * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
-         * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document.
-        If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
-         * @return this stage
-         */
+     * @method unionWith Stage
+     * $unionWith is a stage that allows you to combine the results of an aggregation pipeline with another collection in the same database.
+     * The $unionWith stage is useful when you want to merge the results of a pipeline with documents from another collection that share a similar structure. It is particularly useful when you have two collections with different schemas, but want to combine the results in a single aggregation pipeline.
+     * The $unionWith stage takes two options: coll and pipeline. The coll option specifies the name of the collection to union with, and the pipeline option specifies the aggregation pipeline to apply to the unioned collection.
+  
+     * @type {UnionWith } - arg
+     * @type {string} Lookup.coll - the name of the collection to union with.
+     * @type {String} Lookup.pipeline - the aggregation pipeline to apply to the unioned collection.
+     * @return this stage
+     */
+  unionWith: (arg: UnionWith, options?: Options) => AggregationBuilder;
+  /**
+           *  @method unwind Stage
+           * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
+           * @type {Unwind} - arg,
+           * @type  {string} path - field path;
+           * @type {string} includeArrayIndex - Optional. The name of a new field to hold the array index of the element;
+           * @type {boolean} preserveNullAndEmptyArrays- Optional. If true, if the path is null, missing, or an empty array, $unwind outputs the document.
+          If false, if path is null, missing, or an empty array, $unwind does not output a document. The default value is false.;
+           * @return this stage
+           */
   unwind: (arg: Unwind, options?: Options) => AggregationBuilder;
   /**
    *  @method unset Stage
@@ -1027,13 +1049,13 @@ export default class AggregationBuilder {
     $strLenCP: any;
   };
   /**
-         * @method  subtract  Operator
-         * Subtracts two numbers to return the difference
-         * @type {Number | String | Any} - exp1
-         * @type {Number | String | Any} - exp2
-      
-         * @returns this operator
-         */
+           * @method  subtract  Operator
+           * Subtracts two numbers to return the difference
+           * @type {Number | String | Any} - exp1
+           * @type {Number | String | Any} - exp2
+        
+           * @returns this operator
+           */
   subtract: (
     exp1: Number | String | any,
     exp2: Number | String | any
@@ -1247,26 +1269,26 @@ export default class AggregationBuilder {
     };
   };
   /**
-         * @method  let  Operator
-         * Binds variables for use in the specified expression, and returns the result of the expression.
-         * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
-         * @type { Any } -
-         * @returns this operator
-         * @example
-         * {
-            $project: {
-               finalTotal: {
-                  $let: {
-                     vars: {
-                        total: { $add: [ '$price', '$tax' ] },
-                        discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
-                     },
-                     in: { $multiply: [ "$$total", "$$discounted" ] }
-                  }
-               }
-            }
-         }
-         */
+           * @method  let  Operator
+           * Binds variables for use in the specified expression, and returns the result of the expression.
+           * @type { Any } -{ vars - Assignment block for the variables accessible in the in expression.in - The expression to evaluate.}
+           * @type { Any } -
+           * @returns this operator
+           * @example
+           * {
+              $project: {
+                 finalTotal: {
+                    $let: {
+                       vars: {
+                          total: { $add: [ '$price', '$tax' ] },
+                          discounted: { $cond: { if: '$applyDiscount', then: 0.9, else: 1 } }
+                       },
+                       in: { $multiply: [ "$$total", "$$discounted" ] }
+                    }
+                 }
+              }
+           }
+           */
   $let: (arg: { vars: any; in: any }) => any;
 }
 export {};
