@@ -1714,7 +1714,7 @@ export default class AggregationBuilder {
    * @type {any} -expr  -An expression that is applied to each element of the input array.
    * @returns this operator
    */
-  map = function (input: string, as?: string, expr?: any) {
+  map = function (input: string | any, as?: string, expr?: any) {
     try {
       const stage: {
         $map: {
