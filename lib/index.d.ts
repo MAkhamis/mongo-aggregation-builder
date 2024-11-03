@@ -12,6 +12,14 @@ interface AggregationOptions {
      * @type {Boolean} serializeFunctions
      */
     serializeFunctions: Boolean;
+    /**
+     * Optional. The index to use for the aggregation. The index is on the initial collection/view against which the aggregation is run.
+     * Specify the index either by the index name or by the index specification document.
+     * The hint does not apply to $lookup and $graphLookup stages.
+     **/
+    hint?: string | {
+        [propName: string]: 1 | -1;
+    };
 }
 interface Options {
     and?: boolean;
@@ -476,9 +484,9 @@ export default class AggregationBuilder {
     dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) => {
         $dateFromString: {
             dateString: string | any;
-            format?: string | undefined;
-            timezone?: string | undefined;
-            onNull?: string | undefined;
+            format?: string;
+            timezone?: string;
+            onNull?: string;
         };
     };
     /**
@@ -1020,7 +1028,7 @@ export default class AggregationBuilder {
     switch: (branches: any[], arg?: string | any) => {
         $switch: {
             branches: any[];
-            default?: string | undefined;
+            default?: string;
         };
     };
     /**
@@ -1034,7 +1042,7 @@ export default class AggregationBuilder {
     map: (input: string | any, as?: string, expr?: any) => {
         $map: {
             input: string;
-            as?: string | undefined;
+            as?: string;
             in: any;
         };
     };

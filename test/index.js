@@ -6,7 +6,7 @@ const agg = new AggregationBuilder();
 // new AggregationBuilder.project({});
 const agg1 = agg
   .addFields(
-    agg.dateToString(agg.convert("$time", "date"), "%y-%m-%d", "Asia/Aamman")
+    agg.dateToString(agg.convert("$time", "date"), "%y-%m-%d", "Asia/Aamman"),
   )
   .sort({ time: -1 })
   .match({ latest: true, company_namespace: agg.in[("demosv", "time")] })
