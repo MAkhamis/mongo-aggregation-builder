@@ -326,6 +326,7 @@ export default class AggregationBuilder {
   option = function (options: AggregationOptions) {
     this.opts.allowDiskUse = options.allowDiskUse || true;
     this.opts.serializeFunctions = options.serializeFunctions || true;
+    if (options.hint) this.opts.hint = options.hint;
   };
   constructor(model?: any) {
     this.model = model;
