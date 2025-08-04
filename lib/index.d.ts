@@ -230,6 +230,16 @@ interface Sort {
      */
     [propName: string]: Number;
 }
+interface SortArray {
+    /**
+     * @type {any} input - An expression that evaluates to an array.
+     */
+    input: any;
+    /**
+     * @type {any} sortBy - The expression to sort by. Can be a single value or an object with field-order pairs.
+     */
+    sortBy: any;
+}
 interface Search extends SearchComponent {
     /**
            * @example
@@ -443,6 +453,16 @@ export default class AggregationBuilder {
      * @return this stage
      */
     sort: (sortOrder: Sort, options?: Options) => AggregationBuilder;
+    /**
+     * @method sortArray Stage
+     * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
+     * @type {SortArray} - sortArrayParams
+     * @param {any} sortArrayParams.input - An expression that evaluates to an array
+     * @param {any} sortArrayParams.sortBy - The expression to sort by
+     * @see SortArray
+     * @return this stage
+     */
+    sortArray: (sortArrayParams: SortArray, options?: Options) => AggregationBuilder;
     /**
      * @method search Stage
      * searches using the lucsene $search index, uses deafult index (whcih must be created ) unles index is specified.

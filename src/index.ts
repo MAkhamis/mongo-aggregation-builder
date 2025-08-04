@@ -246,6 +246,17 @@ interface Sort {
   [propName: string]: Number;
 }
 
+interface SortArray {
+  /**
+   * @type {any} input - An expression that evaluates to an array.
+   */
+  input: any;
+  /**
+   * @type {any} sortBy - The expression to sort by. Can be a single value or an object with field-order pairs.
+   */
+  sortBy: any;
+}
+
 interface Search extends SearchComponent {
   /**
          * @example
@@ -803,6 +814,24 @@ export default class AggregationBuilder {
   ) {
     if (!this.openStage("sort", options)) return this;
     const stage = { $sort: sortOrder };
+    this.closeStage(stage);
+    return this;
+  };
+  /**
+   * @method sortArray Stage
+   * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
+   * @type {SortArray} - sortArrayParams
+   * @param {any} sortArrayParams.input - An expression that evaluates to an array
+   * @param {any} sortArrayParams.sortBy - The expression to sort by
+   * @see SortArray
+   * @return this stage
+   */
+  sortArray: (sortArrayParams: SortArray, options?: Options) => AggregationBuilder = function (
+    sortArrayParams,
+    options,
+  ) {
+    if (!this.openStage("sortArray", options)) return this;
+    const stage = { $sortArray: sortArrayParams };
     this.closeStage(stage);
     return this;
   };
