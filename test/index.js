@@ -11,9 +11,11 @@ const agg1 = agg
   .sort({ time: -1 })
   .match({ latest: true, company_namespace: agg.in[("demosv", "time")] })
   .addFields({ allItems: agg.concatArrays("$items", "$return_items") })
-  .sortArray({
-    input: "$allItems",
-    sortBy: {"item.qty": 1}
+  .set({
+    sortedItems: agg.sortArray({
+      input: "$allItems",
+      sortBy: { "item.qty": 1 },
+    }),
   })
   .project({ items: 0, return_items: 0 })
   .unwind("$allItems")

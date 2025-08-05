@@ -246,17 +246,6 @@ interface Sort {
   [propName: string]: Number;
 }
 
-interface SortArray {
-  /**
-   * @type {any} input - An expression that evaluates to an array.
-   */
-  input: any;
-  /**
-   * @type {any} sortBy - The expression to sort by. Can be a single value or an object with field-order pairs.
-   */
-  sortBy: any;
-}
-
 interface Search extends SearchComponent {
   /**
          * @example
@@ -814,24 +803,6 @@ export default class AggregationBuilder {
   ) {
     if (!this.openStage("sort", options)) return this;
     const stage = { $sort: sortOrder };
-    this.closeStage(stage);
-    return this;
-  };
-  /**
-   * @method sortArray Stage
-   * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
-   * @type {SortArray} - sortArrayParams
-   * @param {any} sortArrayParams.input - An expression that evaluates to an array
-   * @param {any} sortArrayParams.sortBy - The expression to sort by
-   * @see SortArray
-   * @return this stage
-   */
-  sortArray: (sortArrayParams: SortArray, options?: Options) => AggregationBuilder = function (
-    sortArrayParams,
-    options,
-  ) {
-    if (!this.openStage("sortArray", options)) return this;
-    const stage = { $sortArray: sortArrayParams };
     this.closeStage(stage);
     return this;
   };
@@ -1997,6 +1968,37 @@ export default class AggregationBuilder {
   $let = function (arg: { vars: any; in: any }): any {
     try {
       return { $let: arg };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+  /**
+   * @method sortArray Operator
+   * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
+   * @param {any} input - Type: expression, description: An expression that resolves to an array.
+   * @param {any} sortBy - Type: document, boolean, -1 or 1, description: true (or 1): ascending, false (or -1): descending,  The document specifies a sort ordering.
+   * @returns this operator
+   * @example
+   * {
+   *   $set: {
+   *     items: {
+   *       $sortArray: {
+   *         input: "$items",
+   *         sortBy: { price: 1 } // Sort by price in ascending order
+   *       }
+   *     sortedArray: {
+   *        $sortArray: {
+   *         input: [2,4,6,8],
+   *        sortBy: -1 // Sort in descending order
+   *      }
+   *     }
+   *    }
+   *  }
+   */
+  sortArray = function (input: any, sortBy: any): any {
+    try {
+      return { $sortArray: { input, sortBy } };
     } catch (e) {
       console.error(e);
       throw e;
