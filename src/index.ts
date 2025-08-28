@@ -68,9 +68,6 @@ interface UnionWith {
    */
   pipeline?: any[];
 }
-interface Lookupstage {
-  $lookup: Lookup;
-}
 interface Res {
   /**
    *  @type {string} date -The date to convert to string.must be a valid expression that resolves to a Date, a Timestamp, or an ObjectID.
@@ -246,64 +243,71 @@ interface Sort {
   [propName: string]: Number;
 }
 
-interface Search extends SearchComponent {
-  /**
-         * @example
-         *   { $Search: {
-          compound: {
-            should: [
-              {
-                autocomplete: {
-                  query: "A112m",
-                  path: "name",
-                  score: { boost: { value: 3 } },
-                },
-              },
-              {
-                text: {
-                  query: "A11",
-                  path: "client_code",
-                  score: { boost: { value: 2 } },
-                },
-              },
-            ],
-          },
-        },
-      }; }
-         */
-  compound: { should: SearchComponent[] };
+// Define types for Atlas Search stages
+type SearchStage =
+  | SearchTextStage
+  | SearchAutocompleteStage
+  | SearchEqualsStage
+  | SearchCompoundStage;
+interface BaseSearchStage {
+  path: string | string[];
 }
-interface SearchComponent {
-  index?: string; // optional, defaults to "default"
-  autocomplete?: {
-    query: string;
-    path: string | { wildcard?: string };
-    tokenOrder?: "any" | "sequential";
-    fuzzy?: {
-      maxEdits?: number; // defaults to 2
-      prefixLength?: number; // defaults to 0
-      maxExpansions?: number; // defaults to 50
-    };
-    score?: {
-      boost?: number;
-      constant?: number;
-    };
+type FuzzyOptions = {
+  maxEdits?: number; // default: 2 // 1 or 2
+  prefixLength?: number; // default: 0 // min chars before fuzziness
+  maxExpansions?: number; // default: 50
+};
+interface AutocompleteOperator {
+  autocomplete: {
+    query: string | string[]; // not sure if array is supported
+    path: string | string[];
+    tokenOrder?: "sequential" | "any"; // default: any
+    fuzzy?: FuzzyOptions;
   };
-  text?: {
-    query: string;
-    path: string | { wildcard?: string };
-    tokenOrder?: "any" | "sequential";
-    fuzzy?: {
-      maxEdits?: number; // defaults to 2
-      prefixLength?: number; // defaults to 0
-      maxExpansions?: number; // defaults to 50
-    };
-    score?: {
-      boost?: number;
-      constant?: number;
-    };
-    synonyms?: string;
+}
+interface SearchTextStage extends BaseSearchStage {
+  text: {
+    query: string | string[];
+    path: string | string[];
+    fuzzy?: FuzzyOptions;
   };
+}
+interface SearchAutocompleteStage extends BaseSearchStage {
+  autocomplete: AutocompleteOperator["autocomplete"];
+}
+interface SearchEqualsOperator {
+  equals: {
+    path: string;
+    value: string | number | boolean | Date;
+  };
+}
+interface SearchEqualsStage extends BaseSearchStage {
+  equals: SearchEqualsOperator["equals"];
+}
+type SearchCompoundOperator =
+  | SearchEqualsOperator
+  | AutocompleteOperator
+  | SearchTextStage;
+interface SearchCompoundStage {
+  compound: {
+    must?: SearchCompoundOperator[];
+    mustNot?: SearchCompoundOperator[];
+    should?: SearchCompoundOperator[];
+    filter?: SearchCompoundOperator[];
+    minimumShouldMatch?: number;
+  };
+}
+interface Search {
+  $search: {
+    index?: string;
+    count?: { type: "total" };
+  } & (SearchStage | SearchCompoundStage);
+}
+interface SearchCompound {
+  $search: {
+    index?: string;
+    count?: { type: "total" };
+  } & SearchCompoundStage;
 }
 
 interface amendOptions extends Options {
@@ -1903,7 +1907,6 @@ export default class AggregationBuilder {
       throw e;
     }
   };
-
   /**
    * @method  regexMatch  Operator
    *Performs a regular expression (regex) pattern matching and returns: [true] if a match exists. [false] if a match doesn't exist.
@@ -1935,7 +1938,6 @@ export default class AggregationBuilder {
       throw e;
     }
   };
-
   /**
          * @method  let  Operator
          * Binds variables for use in the specified expression, and returns the result of the expression.
@@ -1965,23 +1967,220 @@ export default class AggregationBuilder {
       throw e;
     }
   };
-
   /**
    * @method search Stage
-   * searches using the lucsene $search index, uses deafult index (whcih must be created ) unles index is specified.
+   * searches using the Lucsene $search index, uses default index (which must be created ) unless index is specified.
    *  The $search stage returns documents that match the specified search string.
-   *  @type {Sort} - sortOrder
-   * [1-->Sort ascending; -1-->Sort descending].
+   * @type {Search} - search
    * @see Search
    * @return this stage
    */
-  search: (
-    sortOrder: Search,
-    options?: Options
-  ) => AggregationBuilder = function (SearchComponents, options) {
-    if (!this.openStage("search", options)) return this;
-    const stage = { $search: SearchComponents };
+  search: (searchDoc: Search["$search"]) => AggregationBuilder = function (
+    searchDoc
+  ) {
+    if (!this.openStage("search")) return this;
+    if (this.aggs?.length) {
+      throw new Error(
+        "The $search stage must be the first stage in the aggregation pipeline."
+      );
+    }
+    const stage = { $search: searchDoc };
     this.closeStage(stage);
     return this;
+  };
+  /**
+   * @method searchCompoundStart
+   * Starts a $search stage in an aggregation pipeline using a compound operator.
+   * The compound operator allows you to combine multiple search conditions (must, mustNot, should, filter)
+   * into a single stage.
+   *
+   * @param index - Optional name of the Atlas Search index to use. If not provided, the default index is used.
+   *
+   * @returns this - Returns the AggregationBuilder instance for chaining.
+   *
+   * @throws Error if there are existing stages in the aggregation pipeline,
+   *               because $search must be the first stage.
+   */
+  searchCompound: (arg: {
+    index?: string;
+    minimumShouldMatch?: number;
+  }) => AggregationBuilder = function (arg: {
+    index?: string;
+    minimumShouldMatch?: number;
+  }) {
+    if (!this.openStage("search")) return this;
+    if (this.aggs?.length) {
+      throw new Error(
+        "The $search stage must be the first stage in the aggregation pipeline."
+      );
+    }
+    const stage: SearchCompound = { $search: { ...arg, compound: {} } };
+    this.closeStage(stage);
+    return this;
+  };
+  /**
+   * @method equals Atlas Search Operator
+   * The equals operator checks whether a field matches a value you specify.
+   * @param {string} path - Indexed field to search.
+   * @param {string | number | boolean | Date | ObjectId | string[]} value
+   * Value to query for. Can be a primitive, ObjectId, Date, or array of strings/numbers.
+   * @returns {{ equals: { path: string, value: any } }} - The equals operator object
+   */
+  searchEquals = function ({
+    path,
+    value,
+  }: {
+    path: string;
+    value: any;
+  }): SearchEqualsOperator {
+    return { equals: { path, value } };
+  };
+  /**
+   * @method autocomplete Atlas Search Operator
+   * The autocomplete operator performs a search for a word or phrase
+   * that contains a sequence of characters from an incomplete input string.
+   *
+   * @param path - Indexed field(s) to search.
+   * @param query - String or array of strings to search for.
+   * @param tokenOrder - Order in which to search for tokens. Default: "any".
+   * @param fuzzy - Optional fuzzy search settings.
+   *
+   * @returns The autocomplete operator object.
+   */
+  searchAutocomplete = function ({
+    path,
+    query,
+    tokenOrder,
+    fuzzy,
+  }: {
+    path: string | string[];
+    query: string | string[];
+    tokenOrder?: "sequential" | "any";
+    fuzzy?: FuzzyOptions;
+  }): AutocompleteOperator {
+    return { autocomplete: { path, query, tokenOrder, fuzzy } };
+  };
+  searchShould: (
+    operator: SearchCompoundOperator,
+    minimumShouldMatch?: number
+  ) => AggregationBuilder = function (
+    operator: SearchCompoundOperator,
+    minimumShouldMatch?: number
+  ) {
+    try {
+      if (!this.openStage("search")) return this;
+
+      const latestStage = this.aggs[this.aggs.length - 1];
+      if (!latestStage.hasOwnProperty("$search")) {
+        throw new Error("$searchShould must be inside a $search stage.");
+      }
+
+      if (!latestStage.$search.hasOwnProperty("compound")) {
+        throw new Error("$searchShould must be inside a compound operator.");
+      }
+
+      const stage = this.aggs.pop();
+      if (stage) {
+        if (!stage.$search.should) {
+          stage.$search.should = [];
+        }
+        stage.$search.should.push(operator);
+        if (Number.isInteger(minimumShouldMatch)) {
+          stage.$search.compound.minimumShouldMatch = minimumShouldMatch;
+        }
+        this.closeStage(stage);
+      }
+      return this;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+  searchMust: (
+    operator: SearchCompoundOperator
+  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
+    try {
+      if (!this.openStage("search")) return this;
+
+      const latestStage = this.aggs[this.aggs.length - 1];
+      if (!latestStage.hasOwnProperty("$search")) {
+        throw new Error("$searchMust must be inside a $search stage.");
+      }
+
+      if (!latestStage.$search.hasOwnProperty("compound")) {
+        throw new Error("$searchMust must be inside a compound operator.");
+      }
+
+      const stage = this.aggs.pop();
+      if (stage) {
+        if (!stage.$search.must) {
+          stage.$search.must = [];
+        }
+        stage.$search.must.push(operator);
+        this.closeStage(stage);
+      }
+      return this;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+  searchMustNot: (
+    operator: SearchCompoundOperator
+  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
+    try {
+      if (!this.openStage("search")) return this;
+
+      const latestStage = this.aggs[this.aggs.length - 1];
+      if (!latestStage.hasOwnProperty("$search")) {
+        throw new Error("$searchMustNot must be inside a $search stage.");
+      }
+
+      if (!latestStage.$search.hasOwnProperty("compound")) {
+        throw new Error("$searchMustNot must be inside a compound operator.");
+      }
+
+      const stage = this.aggs.pop();
+      if (stage) {
+        if (!stage.$search.mustNot) {
+          stage.$search.mustNot = [];
+        }
+        stage.$search.mustNot.push(operator);
+        this.closeStage(stage);
+      }
+      return this;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+  searchFilter: (
+    operator: SearchCompoundOperator
+  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
+    try {
+      if (!this.openStage("search")) return this;
+
+      const latestStage = this.aggs[this.aggs.length - 1];
+      if (!latestStage.hasOwnProperty("$search")) {
+        throw new Error("$searchFilter must be inside a $search stage.");
+      }
+
+      if (!latestStage.$search.hasOwnProperty("compound")) {
+        throw new Error("$searchFilter must be inside a compound operator.");
+      }
+
+      const stage = this.aggs.pop();
+      if (stage) {
+        if (!stage.$search.filter) {
+          stage.$search.filter = [];
+        }
+        stage.$search.filter.push(operator);
+        this.closeStage(stage);
+      }
+      return this;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   };
 }
