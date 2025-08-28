@@ -2228,4 +2228,35 @@ export default class AggregationBuilder {
     this.closeStage(stage);
     return this;
   };
+  /**
+   * @method sortArray Operator
+   * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
+   * @param {any} input - Type: expression, description: An expression that resolves to an array.
+   * @param {any} sortBy - Type: document, boolean, -1 or 1, description: true (or 1): ascending, false (or -1): descending,  The document specifies a sort ordering.
+   * @returns this operator
+   * @example
+   * {
+   *   $set: {
+   *     items: {
+   *       $sortArray: {
+   *         input: "$items",
+   *         sortBy: { price: 1 } // Sort by price in ascending order
+   *       }
+   *     sortedArray: {
+   *        $sortArray: {
+   *         input: [2,4,6,8],
+   *        sortBy: -1 // Sort in descending order
+   *      }
+   *     }
+   *    }
+   *  }
+   */
+  sortArray = function (input: any, sortBy: any): any {
+    try {
+      return { $sortArray: { input, sortBy } };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
 }

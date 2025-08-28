@@ -486,9 +486,9 @@ export default class AggregationBuilder {
     dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) => {
         $dateFromString: {
             dateString: string | any;
-            format?: string | undefined;
-            timezone?: string | undefined;
-            onNull?: string | undefined;
+            format?: string;
+            timezone?: string;
+            onNull?: string;
         };
     };
     /**
@@ -1030,7 +1030,7 @@ export default class AggregationBuilder {
     switch: (branches: any[], arg?: string | any) => {
         $switch: {
             branches: any[];
-            default?: string | undefined;
+            default?: string;
         };
     };
     /**
@@ -1044,7 +1044,7 @@ export default class AggregationBuilder {
     map: (input: string | any, as?: string, expr?: any) => {
         $map: {
             input: string;
-            as?: string | undefined;
+            as?: string;
             in: any;
         };
     };
@@ -1238,8 +1238,8 @@ export default class AggregationBuilder {
     searchAutocomplete: ({ path, query, tokenOrder, fuzzy, }: {
         path: string | string[];
         query: string | string[];
-        tokenOrder?: "any" | "sequential" | undefined;
-        fuzzy?: FuzzyOptions | undefined;
+        tokenOrder?: "sequential" | "any";
+        fuzzy?: FuzzyOptions;
     }) => AutocompleteOperator;
     searchShould: (operator: SearchCompoundOperator, minimumShouldMatch?: number) => AggregationBuilder;
     searchMust: (operator: SearchCompoundOperator) => AggregationBuilder;
@@ -1255,5 +1255,29 @@ export default class AggregationBuilder {
      * @throws {Error} If the $vectorSearch stage is not the first stage in the aggregation pipeline.
      */
     vectorSearch: (vectorSearchArg: VectorSearchOperator["$vectorSearch"]) => AggregationBuilder;
+    /**
+     * @method sortArray Operator
+     * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
+     * @param {any} input - Type: expression, description: An expression that resolves to an array.
+     * @param {any} sortBy - Type: document, boolean, -1 or 1, description: true (or 1): ascending, false (or -1): descending,  The document specifies a sort ordering.
+     * @returns this operator
+     * @example
+     * {
+     *   $set: {
+     *     items: {
+     *       $sortArray: {
+     *         input: "$items",
+     *         sortBy: { price: 1 } // Sort by price in ascending order
+     *       }
+     *     sortedArray: {
+     *        $sortArray: {
+     *         input: [2,4,6,8],
+     *        sortBy: -1 // Sort in descending order
+     *      }
+     *     }
+     *    }
+     *  }
+     */
+    sortArray: (input: any, sortBy: any) => any;
 }
 export {};
