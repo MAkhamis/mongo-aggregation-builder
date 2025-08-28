@@ -284,6 +284,29 @@ interface Search {
         };
     } & (SearchStage | SearchCompoundStage);
 }
+/**
+ * @interface VectorSearchOperator
+ * Defines the structure of the $vectorSearch operator in MongoDB Atlas.
+ *
+ * @property {boolean} [exact=false] - Specifies whether to perform an exact nearest neighbor (ENN) search (`true`) or an approximate nearest neighbor (ANN) search (`false`). Defaults to `false`.
+ * @property {object} [filter] - An optional MongoDB Query Language (MQL) expression to pre-filter the documents before performing the vector search.
+ * @property {string} index - The name of the Atlas Vector Search index to use for the search.
+ * @property {number} limit - The maximum number of documents to return in the result set.
+ * @property {number} [numCandidates] - The number of candidate vectors to consider during the search. Required if `exact` is `false` or omitted.
+ * @property {string | string[]} path - The field or fields containing the vector embeddings to search against.
+ * @property {number[]} queryVector - The vector embedding representing the query for similarity search.
+ */
+interface VectorSearchOperator {
+    $vectorSearch: {
+        exact?: boolean;
+        filter?: Record<string, any>;
+        index: string;
+        limit: number;
+        numCandidates?: number;
+        path: string | string[];
+        queryVector: number[];
+    };
+}
 interface amendOptions extends Options {
     applyLookup?: boolean;
     lookupOptions?: Options;
@@ -1222,5 +1245,15 @@ export default class AggregationBuilder {
     searchMust: (operator: SearchCompoundOperator) => AggregationBuilder;
     searchMustNot: (operator: SearchCompoundOperator) => AggregationBuilder;
     searchFilter: (operator: SearchCompoundOperator) => AggregationBuilder;
+    /**
+     * @method vectorSearch
+     * Adds a $vectorSearch stage to the aggregation pipeline.
+     *
+     * @param {VectorSearchOperator["$vectorSearch"]} vectorSearchDoc - The vector search definition.
+     * @returns {AggregationBuilder} The current aggregation builder instance with the added $vectorSearch stage.
+     *
+     * @throws {Error} If the $vectorSearch stage is not the first stage in the aggregation pipeline.
+     */
+    vectorSearch: (vectorSearchArg: VectorSearchOperator["$vectorSearch"]) => AggregationBuilder;
 }
 export {};

@@ -60,3 +60,19 @@ agg.search({
     minimumShouldMatch: 1,
   },
 });
+
+agg.vectorSearch({
+  index: "vector_index",
+  path: "plot_embedding_voyage_3_large",
+  queryVector: [
+    -0.034731735,
+    0.008558298,
+    -0.0153717,
+    -0.029912498,
+    -0.006688767,
+    0.047527634,
+    0.040714234,
+  ],
+  numCandidates: 150,
+  limit: 10,
+});
