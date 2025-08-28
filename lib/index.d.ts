@@ -230,69 +230,81 @@ interface Sort {
      */
     [propName: string]: Number;
 }
-interface Search extends SearchComponent {
-    /**
-           * @example
-           *   { $Search: {
-            compound: {
-              should: [
-                {
-                  autocomplete: {
-                    query: "A112m",
-                    path: "name",
-                    score: { boost: { value: 3 } },
-                  },
-                },
-                {
-                  text: {
-                    query: "A11",
-                    path: "client_code",
-                    score: { boost: { value: 2 } },
-                  },
-                },
-              ],
-            },
-          },
-        }; }
-           */
-    compound: {
-        should: SearchComponent[];
+type SearchStage = SearchTextStage | SearchAutocompleteStage | SearchEqualsStage | SearchCompoundStage;
+interface BaseSearchStage {
+    path: string | string[];
+}
+type FuzzyOptions = {
+    maxEdits?: number;
+    prefixLength?: number;
+    maxExpansions?: number;
+};
+interface AutocompleteOperator {
+    autocomplete: {
+        query: string | string[];
+        path: string | string[];
+        tokenOrder?: "sequential" | "any";
+        fuzzy?: FuzzyOptions;
     };
 }
-interface SearchComponent {
-    index?: string;
-    autocomplete?: {
-        query: string;
-        path: string | {
-            wildcard?: string;
-        };
-        tokenOrder?: "any" | "sequential";
-        fuzzy?: {
-            maxEdits?: number;
-            prefixLength?: number;
-            maxExpansions?: number;
-        };
-        score?: {
-            boost?: number;
-            constant?: number;
-        };
+interface SearchTextStage extends BaseSearchStage {
+    text: {
+        query: string | string[];
+        path: string | string[];
+        fuzzy?: FuzzyOptions;
     };
-    text?: {
-        query: string;
-        path: string | {
-            wildcard?: string;
+}
+interface SearchAutocompleteStage extends BaseSearchStage {
+    autocomplete: AutocompleteOperator["autocomplete"];
+}
+interface SearchEqualsOperator {
+    equals: {
+        path: string;
+        value: string | number | boolean | Date;
+    };
+}
+interface SearchEqualsStage extends BaseSearchStage {
+    equals: SearchEqualsOperator["equals"];
+}
+type SearchCompoundOperator = SearchEqualsOperator | AutocompleteOperator | SearchTextStage;
+interface SearchCompoundStage {
+    compound: {
+        must?: SearchCompoundOperator[];
+        mustNot?: SearchCompoundOperator[];
+        should?: SearchCompoundOperator[];
+        filter?: SearchCompoundOperator[];
+        minimumShouldMatch?: number;
+    };
+}
+interface Search {
+    $search: {
+        index?: string;
+        count?: {
+            type: "total";
         };
-        tokenOrder?: "any" | "sequential";
-        fuzzy?: {
-            maxEdits?: number;
-            prefixLength?: number;
-            maxExpansions?: number;
-        };
-        score?: {
-            boost?: number;
-            constant?: number;
-        };
-        synonyms?: string;
+    } & (SearchStage | SearchCompoundStage);
+}
+/**
+ * @interface VectorSearchOperator
+ * Defines the structure of the $vectorSearch operator in MongoDB Atlas.
+ *
+ * @property {boolean} [exact=false] - Specifies whether to perform an exact nearest neighbor (ENN) search (`true`) or an approximate nearest neighbor (ANN) search (`false`). Defaults to `false`.
+ * @property {object} [filter] - An optional MongoDB Query Language (MQL) expression to pre-filter the documents before performing the vector search.
+ * @property {string} index - The name of the Atlas Vector Search index to use for the search.
+ * @property {number} limit - The maximum number of documents to return in the result set.
+ * @property {number} [numCandidates] - The number of candidate vectors to consider during the search. Required if `exact` is `false` or omitted.
+ * @property {string | string[]} path - The field or fields containing the vector embeddings to search against.
+ * @property {number[]} queryVector - The vector embedding representing the query for similarity search.
+ */
+interface VectorSearchOperator {
+    $vectorSearch: {
+        exact?: boolean;
+        filter?: Record<string, any>;
+        index: string;
+        limit: number;
+        numCandidates?: number;
+        path: string | string[];
+        queryVector: number[];
     };
 }
 interface amendOptions extends Options {
@@ -444,16 +456,6 @@ export default class AggregationBuilder {
      */
     sort: (sortOrder: Sort, options?: Options) => AggregationBuilder;
     /**
-     * @method search Stage
-     * searches using the lucsene $search index, uses deafult index (whcih must be created ) unles index is specified.
-     *  The $search stage returns documents that match the specified search string.
-     *  @type {Sort} - sortOrder
-     * [1-->Sort ascending; -1-->Sort descending].
-     * @see Search
-     * @return this stage
-     */
-    search: (sortOrder: Search, options?: Options) => AggregationBuilder;
-    /**
      * @method facet Stage
      * Processes multiple aggregation pipelines within a single stage on the same set of input documents.
      * @type {[propName: string]: any[]} - arg
@@ -484,9 +486,9 @@ export default class AggregationBuilder {
     dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) => {
         $dateFromString: {
             dateString: string | any;
-            format?: string;
-            timezone?: string;
-            onNull?: string;
+            format?: string | undefined;
+            timezone?: string | undefined;
+            onNull?: string | undefined;
         };
     };
     /**
@@ -1028,7 +1030,7 @@ export default class AggregationBuilder {
     switch: (branches: any[], arg?: string | any) => {
         $switch: {
             branches: any[];
-            default?: string;
+            default?: string | undefined;
         };
     };
     /**
@@ -1042,7 +1044,7 @@ export default class AggregationBuilder {
     map: (input: string | any, as?: string, expr?: any) => {
         $map: {
             input: string;
-            as?: string;
+            as?: string | undefined;
             in: any;
         };
     };
@@ -1183,6 +1185,76 @@ export default class AggregationBuilder {
         vars: any;
         in: any;
     }) => any;
+    /**
+     * @method search Stage
+     * searches using the Lucsene $search index, uses default index (which must be created ) unless index is specified.
+     *  The $search stage returns documents that match the specified search string.
+     * @type {Search} - search
+     * @see Search
+     * @return this stage
+     */
+    search: (searchDoc: Search["$search"]) => AggregationBuilder;
+    /**
+     * @method searchCompoundStart
+     * Starts a $search stage in an aggregation pipeline using a compound operator.
+     * The compound operator allows you to combine multiple search conditions (must, mustNot, should, filter)
+     * into a single stage.
+     *
+     * @param index - Optional name of the Atlas Search index to use. If not provided, the default index is used.
+     *
+     * @returns this - Returns the AggregationBuilder instance for chaining.
+     *
+     * @throws Error if there are existing stages in the aggregation pipeline,
+     *               because $search must be the first stage.
+     */
+    searchCompound: (arg: {
+        index?: string;
+        minimumShouldMatch?: number;
+    }) => AggregationBuilder;
+    /**
+     * @method equals Atlas Search Operator
+     * The equals operator checks whether a field matches a value you specify.
+     * @param {string} path - Indexed field to search.
+     * @param {string | number | boolean | Date | ObjectId | string[]} value
+     * Value to query for. Can be a primitive, ObjectId, Date, or array of strings/numbers.
+     * @returns {{ equals: { path: string, value: any } }} - The equals operator object
+     */
+    searchEquals: ({ path, value, }: {
+        path: string;
+        value: any;
+    }) => SearchEqualsOperator;
+    /**
+     * @method autocomplete Atlas Search Operator
+     * The autocomplete operator performs a search for a word or phrase
+     * that contains a sequence of characters from an incomplete input string.
+     *
+     * @param path - Indexed field(s) to search.
+     * @param query - String or array of strings to search for.
+     * @param tokenOrder - Order in which to search for tokens. Default: "any".
+     * @param fuzzy - Optional fuzzy search settings.
+     *
+     * @returns The autocomplete operator object.
+     */
+    searchAutocomplete: ({ path, query, tokenOrder, fuzzy, }: {
+        path: string | string[];
+        query: string | string[];
+        tokenOrder?: "any" | "sequential" | undefined;
+        fuzzy?: FuzzyOptions | undefined;
+    }) => AutocompleteOperator;
+    searchShould: (operator: SearchCompoundOperator, minimumShouldMatch?: number) => AggregationBuilder;
+    searchMust: (operator: SearchCompoundOperator) => AggregationBuilder;
+    searchMustNot: (operator: SearchCompoundOperator) => AggregationBuilder;
+    searchFilter: (operator: SearchCompoundOperator) => AggregationBuilder;
+    /**
+     * @method vectorSearch
+     * Adds a $vectorSearch stage to the aggregation pipeline.
+     *
+     * @param {VectorSearchOperator["$vectorSearch"]} vectorSearchDoc - The vector search definition.
+     * @returns {AggregationBuilder} The current aggregation builder instance with the added $vectorSearch stage.
+     *
+     * @throws {Error} If the $vectorSearch stage is not the first stage in the aggregation pipeline.
+     */
+    vectorSearch: (vectorSearchArg: VectorSearchOperator["$vectorSearch"]) => AggregationBuilder;
     /**
      * @method sortArray Operator
      * Sorts an array based on its elements. The sort order is specified by a sortBy expression.
