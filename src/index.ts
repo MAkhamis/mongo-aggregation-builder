@@ -362,7 +362,7 @@ export default class AggregationBuilder {
 
   openStage: (suffix: string, options?: Options) => boolean = (
     suffix,
-    options
+    options,
   ) => {
     try {
       if (!this.isIf) {
@@ -414,7 +414,7 @@ export default class AggregationBuilder {
    */
   lookup: (arg: Lookup, options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("lookup", options)) return this;
 
@@ -478,7 +478,7 @@ export default class AggregationBuilder {
    */
   unionWith: (
     arg: UnionWith,
-    options?: Options
+    options?: Options,
   ) => AggregationBuilder = function (arg, options) {
     if (!this.openStage("lookup", options)) return this;
     if (!arg.pipeline)
@@ -504,7 +504,7 @@ export default class AggregationBuilder {
          */
   unwind: (arg: Unwind, options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("unwind", options)) return this;
     /**
@@ -526,7 +526,7 @@ export default class AggregationBuilder {
    */
   unset: (arg: string[], options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("unset", options)) return this;
     /**
@@ -544,7 +544,7 @@ export default class AggregationBuilder {
    */
   matchSmart: (arg: Match, options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("match", options)) return this;
     let stage;
@@ -574,7 +574,7 @@ export default class AggregationBuilder {
    *    */
   match: (arg: Match, options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("match", options)) return this;
     if (options && (options.smart || options.or || options.and))
@@ -599,7 +599,7 @@ export default class AggregationBuilder {
    */
   addFields: (
     fields: AddFields,
-    options?: Options
+    options?: Options,
   ) => AggregationBuilder = function (fields, options) {
     if (!this.openStage("addFields", options)) return this;
     /**
@@ -617,7 +617,7 @@ export default class AggregationBuilder {
    */
   project: (projection: Project, options?: Options) => AggregationBuilder = (
     projection,
-    options
+    options,
   ) => {
     try {
       if (!this.openStage("project", options)) return this;
@@ -634,7 +634,7 @@ export default class AggregationBuilder {
   };
   amendProject: (
     projection: Project,
-    options?: amendOptions
+    options?: amendOptions,
   ) => AggregationBuilder = (projection, options) => {
     try {
       if (!this.openStage("project", options)) return this;
@@ -677,7 +677,7 @@ export default class AggregationBuilder {
    */
   limit: (limit: Number, options?: Options) => AggregationBuilder = function (
     limit,
-    options
+    options,
   ) {
     if (!this.openStage("limit", options)) return this;
     const stage = { $limit: limit };
@@ -693,7 +693,7 @@ export default class AggregationBuilder {
    */
   count: (string: String, options?: Options) => AggregationBuilder = function (
     string,
-    options
+    options,
   ) {
     if (!this.openStage("count", options)) return this;
     const stage = { $count: string };
@@ -709,7 +709,7 @@ export default class AggregationBuilder {
    */
   skip: (skip: Number, options?: Options) => AggregationBuilder = function (
     skip,
-    options
+    options,
   ) {
     if (!this.openStage("skip", options)) return this;
     const stage = { $skip: skip };
@@ -724,7 +724,7 @@ export default class AggregationBuilder {
    */
   set: (field: Set, options?: Options) => AggregationBuilder = function (
     field,
-    options
+    options,
   ) {
     if (!this.openStage("set", options)) return this;
     /**
@@ -745,7 +745,7 @@ export default class AggregationBuilder {
   group: (
     id: any,
     arg: Group,
-    options?: Options
+    options?: Options,
   ) => AggregationBuilder = function (id, arg, options) {
     if (!this.openStage("group", options)) return this;
     let stage: any;
@@ -777,7 +777,7 @@ export default class AggregationBuilder {
     id: any,
     arg: Group,
     lookup_arg?: Lookup,
-    options?: amendOptions
+    options?: amendOptions,
   ) => AggregationBuilder = function (id, arg, lookup_arg, options) {
     try {
       if (!this.openStage("group", options)) return this;
@@ -833,7 +833,7 @@ export default class AggregationBuilder {
    */
   sort: (sortOrder: Sort, options?: Options) => AggregationBuilder = function (
     sortOrder,
-    options
+    options,
   ) {
     if (!this.openStage("sort", options)) return this;
     const stage = { $sort: sortOrder };
@@ -849,7 +849,7 @@ export default class AggregationBuilder {
    */
   facet: (arg: Facet, options?: Options) => AggregationBuilder = function (
     arg,
-    options
+    options,
   ) {
     if (!this.openStage("facet", options)) return this;
     let stage: any;
@@ -864,7 +864,7 @@ export default class AggregationBuilder {
   currentFacetKey: string | undefined = undefined;
   startFacet: (stage_name: string, options?: Options) => AggregationBuilder = (
     stage_name,
-    options
+    options,
   ) => {
     try {
       if (!this.openStage("facet", options)) return this;
@@ -901,7 +901,7 @@ export default class AggregationBuilder {
    */
   replaceRoot: (key: string | any, options?: Options) => AggregationBuilder = (
     key,
-    options
+    options,
   ) => {
     if (!this.openStage("replaceRoot", options)) return this;
     let stage;
@@ -927,7 +927,7 @@ export default class AggregationBuilder {
     format?: String | any,
     timezone?: string | any,
     onNull?: string | any,
-    options?: Options
+    options?: Options,
   ) {
     try {
       const stage: {
@@ -969,7 +969,7 @@ export default class AggregationBuilder {
     initialValue: any,
     key?: string,
     condition?: any,
-    options?: reduceAndConcatOptions
+    options?: reduceAndConcatOptions,
   ) => any = (input, initialValue, key, condition, options) => {
     if (input[0] != "$") input = `$${input}`;
 
@@ -1122,7 +1122,7 @@ export default class AggregationBuilder {
   dateToString = function (
     date: String | any,
     format?: any,
-    timezone?: String
+    timezone?: String,
   ) {
     let res: Res = {
       date: date,
@@ -1268,7 +1268,7 @@ export default class AggregationBuilder {
   isIf: Boolean = true;
   if: (condition: any, options?: Options) => AggregationBuilder = function (
     condition,
-    options
+    options,
   ) {
     // if  = function (condition: any, options: Options) {
     if (condition) this.isIf = true;
@@ -1349,7 +1349,7 @@ export default class AggregationBuilder {
    */
   multiply = function (
     key1: string | number | any,
-    key2: string | number | any
+    key2: string | number | any,
   ) {
     return { $multiply: [key1, key2] };
   };
@@ -1397,7 +1397,7 @@ export default class AggregationBuilder {
     arr7?: any | any[],
     arr8?: any | any[],
     arr9?: any | any[],
-    arr10?: any | any[]
+    arr10?: any | any[],
   ) {
     let arr = [arr1, arr2];
     arr3 !== undefined ? arr.push(arr3) : 0;
@@ -1429,7 +1429,7 @@ export default class AggregationBuilder {
     arr7?: any | any[],
     arr8?: any | any[],
     arr9?: any | any[],
-    arr10?: any | any[]
+    arr10?: any | any[],
   ) {
     let arr = [arr1, arr2];
     arr3 !== undefined ? arr.push(arr3) : 0;
@@ -1659,7 +1659,7 @@ export default class AggregationBuilder {
          */
   subtract = function (
     exp1: Number | String | any,
-    exp2: Number | String | any
+    exp2: Number | String | any,
   ) {
     return { $subtract: [exp1, exp2] };
   };
@@ -1999,12 +1999,12 @@ export default class AggregationBuilder {
    * @return this stage
    */
   search: (searchDoc: Search["$search"]) => AggregationBuilder = function (
-    searchDoc
+    searchDoc,
   ) {
     if (!this.openStage("search")) return this;
     if (this.aggs?.length) {
       throw new Error(
-        "The $search stage must be the first stage in the aggregation pipeline."
+        "The $search stage must be the first stage in the aggregation pipeline.",
       );
     }
     const stage = { $search: searchDoc };
@@ -2034,10 +2034,15 @@ export default class AggregationBuilder {
     if (!this.openStage("search")) return this;
     if (this.aggs?.length) {
       throw new Error(
-        "The $search stage must be the first stage in the aggregation pipeline."
+        "The $search stage must be the first stage in the aggregation pipeline.",
       );
     }
-    const stage: SearchCompound = { $search: { ...arg, compound: {} } };
+    const stage: SearchCompound = {
+      $search: { index: arg.index, compound: {} },
+    };
+    if (Number.isInteger(arg.minimumShouldMatch)) {
+      stage.$search.compound.minimumShouldMatch = arg.minimumShouldMatch;
+    }
     this.closeStage(stage);
     return this;
   };
@@ -2085,10 +2090,10 @@ export default class AggregationBuilder {
   };
   searchShould: (
     operator: SearchCompoundOperator,
-    minimumShouldMatch?: number
+    minimumShouldMatch?: number,
   ) => AggregationBuilder = function (
     operator: SearchCompoundOperator,
-    minimumShouldMatch?: number
+    minimumShouldMatch?: number,
   ) {
     try {
       if (!this.openStage("search")) return this;
@@ -2102,12 +2107,12 @@ export default class AggregationBuilder {
         throw new Error("$searchShould must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.should) {
-          stage.$search.should = [];
+        if (!stage.$search.compound.should) {
+          stage.$search.compound.should = [];
         }
-        stage.$search.should.push(operator);
+        stage.$search.compound.should.push(operator);
         if (Number.isInteger(minimumShouldMatch)) {
           stage.$search.compound.minimumShouldMatch = minimumShouldMatch;
         }
@@ -2120,7 +2125,7 @@ export default class AggregationBuilder {
     }
   };
   searchMust: (
-    operator: SearchCompoundOperator
+    operator: SearchCompoundOperator,
   ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
     try {
       if (!this.openStage("search")) return this;
@@ -2134,12 +2139,13 @@ export default class AggregationBuilder {
         throw new Error("$searchMust must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.must) {
-          stage.$search.must = [];
+        if (!stage.$search.compound.must) {
+          stage.$search.compound.must = [];
         }
-        stage.$search.must.push(operator);
+
+        stage.$search.compound.must.push(operator);
         this.closeStage(stage);
       }
       return this;
@@ -2149,7 +2155,7 @@ export default class AggregationBuilder {
     }
   };
   searchMustNot: (
-    operator: SearchCompoundOperator
+    operator: SearchCompoundOperator,
   ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
     try {
       if (!this.openStage("search")) return this;
@@ -2163,12 +2169,12 @@ export default class AggregationBuilder {
         throw new Error("$searchMustNot must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.mustNot) {
-          stage.$search.mustNot = [];
+        if (!stage.$search.compound.mustNot) {
+          stage.$search.compound.mustNot = [];
         }
-        stage.$search.mustNot.push(operator);
+        stage.$search.compound.mustNot.push(operator);
         this.closeStage(stage);
       }
       return this;
@@ -2178,7 +2184,7 @@ export default class AggregationBuilder {
     }
   };
   searchFilter: (
-    operator: SearchCompoundOperator
+    operator: SearchCompoundOperator,
   ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
     try {
       if (!this.openStage("search")) return this;
@@ -2192,12 +2198,12 @@ export default class AggregationBuilder {
         throw new Error("$searchFilter must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.filter) {
-          stage.$search.filter = [];
+        if (!stage.$search.compound.filter) {
+          stage.$search.compound.filter = [];
         }
-        stage.$search.filter.push(operator);
+        stage.$search.compound.filter.push(operator);
         this.closeStage(stage);
       }
       return this;
@@ -2216,12 +2222,12 @@ export default class AggregationBuilder {
    * @throws {Error} If the $vectorSearch stage is not the first stage in the aggregation pipeline.
    */
   vectorSearch: (
-    vectorSearchArg: VectorSearchOperator["$vectorSearch"]
+    vectorSearchArg: VectorSearchOperator["$vectorSearch"],
   ) => AggregationBuilder = function (vectorSearchArg) {
     if (!this.openStage("vectorSearch")) return this;
     if (this.aggs?.length) {
       throw new Error(
-        "The $vectorSearch stage must be the first stage in the aggregation pipeline."
+        "The $vectorSearch stage must be the first stage in the aggregation pipeline.",
       );
     }
     const stage = { $vectorSearch: vectorSearchArg };
