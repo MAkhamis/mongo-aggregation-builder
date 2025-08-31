@@ -486,9 +486,9 @@ export default class AggregationBuilder {
     dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) => {
         $dateFromString: {
             dateString: string | any;
-            format?: string;
-            timezone?: string;
-            onNull?: string;
+            format?: string | undefined;
+            timezone?: string | undefined;
+            onNull?: string | undefined;
         };
     };
     /**
@@ -1030,7 +1030,7 @@ export default class AggregationBuilder {
     switch: (branches: any[], arg?: string | any) => {
         $switch: {
             branches: any[];
-            default?: string;
+            default?: string | undefined;
         };
     };
     /**
@@ -1044,7 +1044,7 @@ export default class AggregationBuilder {
     map: (input: string | any, as?: string, expr?: any) => {
         $map: {
             input: string;
-            as?: string;
+            as?: string | undefined;
             in: any;
         };
     };
@@ -1238,8 +1238,8 @@ export default class AggregationBuilder {
     searchAutocomplete: ({ path, query, tokenOrder, fuzzy, }: {
         path: string | string[];
         query: string | string[];
-        tokenOrder?: "sequential" | "any";
-        fuzzy?: FuzzyOptions;
+        tokenOrder?: "any" | "sequential" | undefined;
+        fuzzy?: FuzzyOptions | undefined;
     }) => AutocompleteOperator;
     searchShould: (operator: SearchCompoundOperator, minimumShouldMatch?: number) => AggregationBuilder;
     searchMust: (operator: SearchCompoundOperator) => AggregationBuilder;
