@@ -2037,7 +2037,12 @@ export default class AggregationBuilder {
         "The $search stage must be the first stage in the aggregation pipeline."
       );
     }
-    const stage: SearchCompound = { $search: { ...arg, compound: {} } };
+    const stage: SearchCompound = {
+      $search: { index: arg.index, compound: {} },
+    };
+    if (Number.isInteger(arg.minimumShouldMatch)) {
+      stage.$search.compound.minimumShouldMatch = arg.minimumShouldMatch;
+    }
     this.closeStage(stage);
     return this;
   };
@@ -2102,12 +2107,12 @@ export default class AggregationBuilder {
         throw new Error("$searchShould must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.should) {
-          stage.$search.should = [];
+        if (!stage.$search.compound.should) {
+          stage.$search.compound.should = [];
         }
-        stage.$search.should.push(operator);
+        stage.$search.compound.should.push(operator);
         if (Number.isInteger(minimumShouldMatch)) {
           stage.$search.compound.minimumShouldMatch = minimumShouldMatch;
         }
@@ -2134,12 +2139,13 @@ export default class AggregationBuilder {
         throw new Error("$searchMust must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.must) {
-          stage.$search.must = [];
+        if (!stage.$search.compound.must) {
+          stage.$search.compound.must = [];
         }
-        stage.$search.must.push(operator);
+
+        stage.$search.compound.must.push(operator);
         this.closeStage(stage);
       }
       return this;
@@ -2163,12 +2169,12 @@ export default class AggregationBuilder {
         throw new Error("$searchMustNot must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.mustNot) {
-          stage.$search.mustNot = [];
+        if (!stage.$search.compound.mustNot) {
+          stage.$search.compound.mustNot = [];
         }
-        stage.$search.mustNot.push(operator);
+        stage.$search.compound.mustNot.push(operator);
         this.closeStage(stage);
       }
       return this;
@@ -2192,12 +2198,12 @@ export default class AggregationBuilder {
         throw new Error("$searchFilter must be inside a compound operator.");
       }
 
-      const stage = this.aggs.pop();
+      const stage: SearchCompound = this.aggs.pop();
       if (stage) {
-        if (!stage.$search.filter) {
-          stage.$search.filter = [];
+        if (!stage.$search.compound.filter) {
+          stage.$search.compound.filter = [];
         }
-        stage.$search.filter.push(operator);
+        stage.$search.compound.filter.push(operator);
         this.closeStage(stage);
       }
       return this;
