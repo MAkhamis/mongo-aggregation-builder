@@ -20,6 +20,14 @@ interface AggregationOptions {
     hint?: string | {
         [propName: string]: 1 | -1;
     };
+    /**
+     * Optional. Specifies a time limit in milliseconds for processing operations.
+     * If you do not specify a value for maxTimeMS, operations will not time out.
+     * A value of 0 explicitly specifies the default unbounded behavior.
+     * MongoDB terminates operations that exceed their allotted time limit using the same mechanism as db.killOp().
+     * @type {Number} maxTimeMS
+     */
+    maxTimeMS?: number;
 }
 interface Options {
     and?: boolean;
