@@ -355,12 +355,14 @@ export default class AggregationBuilder {
   protected opts: AggregationOptions = {
     allowDiskUse: true,
     serializeFunctions: true,
+    maxTimeMS: 0,
   };
   protected model: any;
   protected aggs: any[] = [];
   option = function (options: AggregationOptions) {
     this.opts.allowDiskUse = options.allowDiskUse || true;
     this.opts.serializeFunctions = options.serializeFunctions || true;
+    this.opts.maxTimeMS = options.maxTimeMS || 0;
     if (options.hint) this.opts.hint = options.hint;
   };
   constructor(model?: any) {
