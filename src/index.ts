@@ -6,12 +6,12 @@ interface AggregationOptions {
    * specifies cursor.allowDiskUse().
    * @type {Boolean} allowDiskUse
    */
-  allowDiskUse: Boolean;
+  allowDiskUse?: Boolean;
   /**
    * Specifies whether to serialize functions on any object passed to the server
    * @type {Boolean} serializeFunctions
    */
-  serializeFunctions: Boolean;
+  serializeFunctions?: Boolean;
   /**
    * Optional. The index to use for the aggregation. The index is on the initial collection/view against which the aggregation is run.
    * Specify the index either by the index name or by the index specification document.
@@ -360,9 +360,11 @@ export default class AggregationBuilder {
   protected model: any;
   protected aggs: any[] = [];
   option = function (options: AggregationOptions) {
-    this.opts.allowDiskUse = options.allowDiskUse || true;
-    this.opts.serializeFunctions = options.serializeFunctions || true;
-    this.opts.maxTimeMS = options.maxTimeMS || 0;
+    if (options.allowDiskUse !== undefined)
+      this.opts.allowDiskUse = options.allowDiskUse || true;
+    if (options.serializeFunctions !== undefined)
+      this.opts.serializeFunctions = options.serializeFunctions || true;
+    if (options.maxTimeMS) this.opts.maxTimeMS = options.maxTimeMS || 0;
     if (options.hint) this.opts.hint = options.hint;
   };
   constructor(model?: any) {
@@ -486,22 +488,20 @@ export default class AggregationBuilder {
    * @type {String} Lookup.pipeline - the aggregation pipeline to apply to the unioned collection.
    * @return this stage
    */
-  unionWith: (
-    arg: UnionWith,
-    options?: Options
-  ) => AggregationBuilder = function (arg, options) {
-    if (!this.openStage("lookup", options)) return this;
-    if (!arg.pipeline)
-      throw "key 'pipeline' is required to build unionWith aggregation stage";
-    if (!arg.coll)
-      throw "key 'coll' is required to build unionWith aggregation stage";
-    let stage = {
-      $unionWith: { coll: arg.coll, pipeline: arg.pipeline || [] },
-    };
-    this.closeStage(stage);
+  unionWith: (arg: UnionWith, options?: Options) => AggregationBuilder =
+    function (arg, options) {
+      if (!this.openStage("lookup", options)) return this;
+      if (!arg.pipeline)
+        throw "key 'pipeline' is required to build unionWith aggregation stage";
+      if (!arg.coll)
+        throw "key 'coll' is required to build unionWith aggregation stage";
+      let stage = {
+        $unionWith: { coll: arg.coll, pipeline: arg.pipeline || [] },
+      };
+      this.closeStage(stage);
 
-    return this;
-  };
+      return this;
+    };
   /**
          *  @method unwind Stage
          * Deconstructs an array field from the input documents to output a document for each element. Each output document is the input document with the value of the array field replaced by the element.
@@ -607,18 +607,16 @@ export default class AggregationBuilder {
    * @type {[propName: string]: string | any} - fields,
    * @return this stage
    */
-  addFields: (
-    fields: AddFields,
-    options?: Options
-  ) => AggregationBuilder = function (fields, options) {
-    if (!this.openStage("addFields", options)) return this;
-    /**
-     * @see AddFields
-     */
-    const stage = { $addFields: fields };
-    this.closeStage(stage);
-    return this;
-  };
+  addFields: (fields: AddFields, options?: Options) => AggregationBuilder =
+    function (fields, options) {
+      if (!this.openStage("addFields", options)) return this;
+      /**
+       * @see AddFields
+       */
+      const stage = { $addFields: fields };
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method project Stage
    * specified fields can be existing fields from the input documents or newly computed fields.
@@ -752,29 +750,26 @@ export default class AggregationBuilder {
    * @type {[propName: string]: any} - Group.propName
    * @return this stage
    */
-  group: (
-    id: any,
-    arg: Group,
-    options?: Options
-  ) => AggregationBuilder = function (id, arg, options) {
-    if (!this.openStage("group", options)) return this;
-    let stage: any;
-    /**
-     * @see Group
-     *
-     */
-    stage = { $group: arg };
-    stage.$group._id = id;
-    if (options?.checkLookup?.length) {
-      options.checkLookup.forEach((key) => {
-        if (stage.$group._id[key]) {
-          stage.$group._id[key] = `${stage.$group._id[key]}._id`;
-        }
-      });
-    }
-    this.closeStage(stage);
-    return this;
-  };
+  group: (id: any, arg: Group, options?: Options) => AggregationBuilder =
+    function (id, arg, options) {
+      if (!this.openStage("group", options)) return this;
+      let stage: any;
+      /**
+       * @see Group
+       *
+       */
+      stage = { $group: arg };
+      stage.$group._id = id;
+      if (options?.checkLookup?.length) {
+        options.checkLookup.forEach((key) => {
+          if (stage.$group._id[key]) {
+            stage.$group._id[key] = `${stage.$group._id[key]}._id`;
+          }
+        });
+      }
+      this.closeStage(stage);
+      return this;
+    };
   /**
    * @method amendGroup Stage
    * *****
@@ -2134,94 +2129,91 @@ export default class AggregationBuilder {
       throw e;
     }
   };
-  searchMust: (
-    operator: SearchCompoundOperator
-  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
-    try {
-      if (!this.openStage("search")) return this;
+  searchMust: (operator: SearchCompoundOperator) => AggregationBuilder =
+    function (operator: SearchCompoundOperator) {
+      try {
+        if (!this.openStage("search")) return this;
 
-      const latestStage = this.aggs[this.aggs.length - 1];
-      if (!latestStage.hasOwnProperty("$search")) {
-        throw new Error("$searchMust must be inside a $search stage.");
-      }
-
-      if (!latestStage.$search.hasOwnProperty("compound")) {
-        throw new Error("$searchMust must be inside a compound operator.");
-      }
-
-      const stage: SearchCompound = this.aggs.pop();
-      if (stage) {
-        if (!stage.$search.compound.must) {
-          stage.$search.compound.must = [];
+        const latestStage = this.aggs[this.aggs.length - 1];
+        if (!latestStage.hasOwnProperty("$search")) {
+          throw new Error("$searchMust must be inside a $search stage.");
         }
 
-        stage.$search.compound.must.push(operator);
-        this.closeStage(stage);
-      }
-      return this;
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
-  searchMustNot: (
-    operator: SearchCompoundOperator
-  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
-    try {
-      if (!this.openStage("search")) return this;
-
-      const latestStage = this.aggs[this.aggs.length - 1];
-      if (!latestStage.hasOwnProperty("$search")) {
-        throw new Error("$searchMustNot must be inside a $search stage.");
-      }
-
-      if (!latestStage.$search.hasOwnProperty("compound")) {
-        throw new Error("$searchMustNot must be inside a compound operator.");
-      }
-
-      const stage: SearchCompound = this.aggs.pop();
-      if (stage) {
-        if (!stage.$search.compound.mustNot) {
-          stage.$search.compound.mustNot = [];
+        if (!latestStage.$search.hasOwnProperty("compound")) {
+          throw new Error("$searchMust must be inside a compound operator.");
         }
-        stage.$search.compound.mustNot.push(operator);
-        this.closeStage(stage);
-      }
-      return this;
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
-  searchFilter: (
-    operator: SearchCompoundOperator
-  ) => AggregationBuilder = function (operator: SearchCompoundOperator) {
-    try {
-      if (!this.openStage("search")) return this;
 
-      const latestStage = this.aggs[this.aggs.length - 1];
-      if (!latestStage.hasOwnProperty("$search")) {
-        throw new Error("$searchFilter must be inside a $search stage.");
-      }
+        const stage: SearchCompound = this.aggs.pop();
+        if (stage) {
+          if (!stage.$search.compound.must) {
+            stage.$search.compound.must = [];
+          }
 
-      if (!latestStage.$search.hasOwnProperty("compound")) {
-        throw new Error("$searchFilter must be inside a compound operator.");
-      }
-
-      const stage: SearchCompound = this.aggs.pop();
-      if (stage) {
-        if (!stage.$search.compound.filter) {
-          stage.$search.compound.filter = [];
+          stage.$search.compound.must.push(operator);
+          this.closeStage(stage);
         }
-        stage.$search.compound.filter.push(operator);
-        this.closeStage(stage);
+        return this;
+      } catch (e) {
+        console.error(e);
+        throw e;
       }
-      return this;
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
+    };
+  searchMustNot: (operator: SearchCompoundOperator) => AggregationBuilder =
+    function (operator: SearchCompoundOperator) {
+      try {
+        if (!this.openStage("search")) return this;
+
+        const latestStage = this.aggs[this.aggs.length - 1];
+        if (!latestStage.hasOwnProperty("$search")) {
+          throw new Error("$searchMustNot must be inside a $search stage.");
+        }
+
+        if (!latestStage.$search.hasOwnProperty("compound")) {
+          throw new Error("$searchMustNot must be inside a compound operator.");
+        }
+
+        const stage: SearchCompound = this.aggs.pop();
+        if (stage) {
+          if (!stage.$search.compound.mustNot) {
+            stage.$search.compound.mustNot = [];
+          }
+          stage.$search.compound.mustNot.push(operator);
+          this.closeStage(stage);
+        }
+        return this;
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };
+  searchFilter: (operator: SearchCompoundOperator) => AggregationBuilder =
+    function (operator: SearchCompoundOperator) {
+      try {
+        if (!this.openStage("search")) return this;
+
+        const latestStage = this.aggs[this.aggs.length - 1];
+        if (!latestStage.hasOwnProperty("$search")) {
+          throw new Error("$searchFilter must be inside a $search stage.");
+        }
+
+        if (!latestStage.$search.hasOwnProperty("compound")) {
+          throw new Error("$searchFilter must be inside a compound operator.");
+        }
+
+        const stage: SearchCompound = this.aggs.pop();
+        if (stage) {
+          if (!stage.$search.compound.filter) {
+            stage.$search.compound.filter = [];
+          }
+          stage.$search.compound.filter.push(operator);
+          this.closeStage(stage);
+        }
+        return this;
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };
   /**
    * @method vectorSearch
    * Adds a $vectorSearch stage to the aggregation pipeline.

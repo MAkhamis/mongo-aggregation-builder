@@ -6,12 +6,12 @@ interface AggregationOptions {
      * specifies cursor.allowDiskUse().
      * @type {Boolean} allowDiskUse
      */
-    allowDiskUse: Boolean;
+    allowDiskUse?: Boolean;
     /**
      * Specifies whether to serialize functions on any object passed to the server
      * @type {Boolean} serializeFunctions
      */
-    serializeFunctions: Boolean;
+    serializeFunctions?: Boolean;
     /**
      * Optional. The index to use for the aggregation. The index is on the initial collection/view against which the aggregation is run.
      * Specify the index either by the index name or by the index specification document.
