@@ -231,6 +231,44 @@ interface Filter {
      */
     cond: any;
 }
+interface GeoNear {
+    /**
+     * @type {any} near - Required. GeoJSON point or legacy coordinate pair for which to find the closest documents.
+     */
+    near: any;
+    /**
+     * @type {string} distanceField - Required. The output field that contains the calculated distance.
+     */
+    distanceField: string;
+    /**
+     * @type {boolean} spherical - Optional. Determines how MongoDB calculates the distance. Default: false.
+     */
+    spherical?: boolean;
+    /**
+     * @type {number} maxDistance - Optional. The maximum distance from the center point.
+     */
+    maxDistance?: number;
+    /**
+     * @type {number} minDistance - Optional. The minimum distance from the center point.
+     */
+    minDistance?: number;
+    /**
+     * @type {any} query - Optional. Limits the results to the documents that match the query.
+     */
+    query?: any;
+    /**
+     * @type {number} distanceMultiplier - Optional. The factor to multiply all distances returned.
+     */
+    distanceMultiplier?: number;
+    /**
+     * @type {string} includeLocs - Optional. Output field that identifies the location used to calculate distance.
+     */
+    includeLocs?: string;
+    /**
+     * @type {string} key - Optional. Specify the geospatial indexed field to use when calculating distance.
+     */
+    key?: string;
+}
 interface Sort {
     /**
      * @example
@@ -437,6 +475,23 @@ export default class AggregationBuilder {
      */
     set: (field: Set, options?: Options) => AggregationBuilder;
     /**
+     * @method geoNear Stage
+     * Outputs documents in order of nearest to farthest from a specified point.
+     * $geoNear requires a geospatial index and must be the first stage in the pipeline.
+     * @type {GeoNear} - arg
+     * @type {any} GeoNear.near - Required. GeoJSON point or legacy coordinate pair.
+     * @type {string} GeoNear.distanceField - Required. Output field containing calculated distance.
+     * @type {boolean} GeoNear.spherical - Optional. Use spherical geometry (default: false).
+     * @type {number} GeoNear.maxDistance - Optional. Maximum distance from center point.
+     * @type {number} GeoNear.minDistance - Optional. Minimum distance from center point.
+     * @type {any} GeoNear.query - Optional. Additional query filter.
+     * @type {number} GeoNear.distanceMultiplier - Optional. Factor to multiply distances.
+     * @type {string} GeoNear.includeLocs - Optional. Output field for location used in calculation.
+     * @type {string} GeoNear.key - Optional. Geospatial indexed field to use.
+     * @return this stage
+     */
+    geoNear: (arg: GeoNear, options?: Options) => AggregationBuilder;
+    /**
      * @method group Stage
      * Groups input documents by the specified _id expression and for each distinct grouping, outputs a document.The _id field of each output document contains the unique group by value.
      * @type {Group} - arg
@@ -494,9 +549,9 @@ export default class AggregationBuilder {
     dateFromString: (dateString: String | any, format?: String | any, timezone?: string | any, onNull?: string | any, options?: Options) => {
         $dateFromString: {
             dateString: string | any;
-            format?: string | undefined;
-            timezone?: string | undefined;
-            onNull?: string | undefined;
+            format?: string;
+            timezone?: string;
+            onNull?: string;
         };
     };
     /**
@@ -1038,7 +1093,7 @@ export default class AggregationBuilder {
     switch: (branches: any[], arg?: string | any) => {
         $switch: {
             branches: any[];
-            default?: string | undefined;
+            default?: string;
         };
     };
     /**
@@ -1052,7 +1107,7 @@ export default class AggregationBuilder {
     map: (input: string | any, as?: string, expr?: any) => {
         $map: {
             input: string;
-            as?: string | undefined;
+            as?: string;
             in: any;
         };
     };
@@ -1246,8 +1301,8 @@ export default class AggregationBuilder {
     searchAutocomplete: ({ path, query, tokenOrder, fuzzy, }: {
         path: string | string[];
         query: string | string[];
-        tokenOrder?: "any" | "sequential" | undefined;
-        fuzzy?: FuzzyOptions | undefined;
+        tokenOrder?: "sequential" | "any";
+        fuzzy?: FuzzyOptions;
     }) => AutocompleteOperator;
     searchShould: (operator: SearchCompoundOperator, minimumShouldMatch?: number) => AggregationBuilder;
     searchMust: (operator: SearchCompoundOperator) => AggregationBuilder;

@@ -242,6 +242,45 @@ interface Filter {
   cond: any;
 }
 
+interface GeoNear {
+  /**
+   * @type {any} near - Required. GeoJSON point or legacy coordinate pair for which to find the closest documents.
+   */
+  near: any;
+  /**
+   * @type {string} distanceField - Required. The output field that contains the calculated distance.
+   */
+  distanceField: string;
+  /**
+   * @type {boolean} spherical - Optional. Determines how MongoDB calculates the distance. Default: false.
+   */
+  spherical?: boolean;
+  /**
+   * @type {number} maxDistance - Optional. The maximum distance from the center point.
+   */
+  maxDistance?: number;
+  /**
+   * @type {number} minDistance - Optional. The minimum distance from the center point.
+   */
+  minDistance?: number;
+  /**
+   * @type {any} query - Optional. Limits the results to the documents that match the query.
+   */
+  query?: any;
+  /**
+   * @type {number} distanceMultiplier - Optional. The factor to multiply all distances returned.
+   */
+  distanceMultiplier?: number;
+  /**
+   * @type {string} includeLocs - Optional. Output field that identifies the location used to calculate distance.
+   */
+  includeLocs?: string;
+  /**
+   * @type {string} key - Optional. Specify the geospatial indexed field to use when calculating distance.
+   */
+  key?: string;
+}
+
 interface Sort {
   /**
    * @example
@@ -739,6 +778,62 @@ export default class AggregationBuilder {
      * @see Set
      */
     const stage = { $set: field };
+    this.closeStage(stage);
+    return this;
+  };
+  /**
+   * @method geoNear Stage
+   * Outputs documents in order of nearest to farthest from a specified point.
+   * $geoNear requires a geospatial index and must be the first stage in the pipeline.
+   * @type {GeoNear} - arg
+   * @type {any} GeoNear.near - Required. GeoJSON point or legacy coordinate pair.
+   * @type {string} GeoNear.distanceField - Required. Output field containing calculated distance.
+   * @type {boolean} GeoNear.spherical - Optional. Use spherical geometry (default: false).
+   * @type {number} GeoNear.maxDistance - Optional. Maximum distance from center point.
+   * @type {number} GeoNear.minDistance - Optional. Minimum distance from center point.
+   * @type {any} GeoNear.query - Optional. Additional query filter.
+   * @type {number} GeoNear.distanceMultiplier - Optional. Factor to multiply distances.
+   * @type {string} GeoNear.includeLocs - Optional. Output field for location used in calculation.
+   * @type {string} GeoNear.key - Optional. Geospatial indexed field to use.
+   * @return this stage
+   */
+  geoNear: (arg: GeoNear, options?: Options) => AggregationBuilder = function (
+    arg,
+    options
+  ) {
+    if (!this.openStage("geoNear", options)) return this;
+    if (this.aggs?.length) {
+      throw new Error(
+        "The $geoNear stage must be the first stage in the aggregation pipeline."
+      );
+    }
+    /**
+     * @see GeoNear
+     */
+    if (!arg.near) {
+      throw "key 'near' is required to build geoNear aggregation stage";
+    }
+    if (!arg.distanceField) {
+      throw "key 'distanceField' is required to build geoNear aggregation stage";
+    }
+
+    const stage: any = { $geoNear: {} };
+    stage.$geoNear.near = arg.near;
+    stage.$geoNear.distanceField = arg.distanceField;
+
+    // Add optional parameters if provided
+    if (arg.spherical !== undefined) stage.$geoNear.spherical = arg.spherical;
+    if (arg.maxDistance !== undefined)
+      stage.$geoNear.maxDistance = arg.maxDistance;
+    if (arg.minDistance !== undefined)
+      stage.$geoNear.minDistance = arg.minDistance;
+    if (arg.query !== undefined) stage.$geoNear.query = arg.query;
+    if (arg.distanceMultiplier !== undefined)
+      stage.$geoNear.distanceMultiplier = arg.distanceMultiplier;
+    if (arg.includeLocs !== undefined)
+      stage.$geoNear.includeLocs = arg.includeLocs;
+    if (arg.key !== undefined) stage.$geoNear.key = arg.key;
+
     this.closeStage(stage);
     return this;
   };
