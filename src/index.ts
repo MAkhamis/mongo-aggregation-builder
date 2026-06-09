@@ -38,6 +38,7 @@ interface Options {
   preserveNullAndEmptyArrays?: boolean;
   unwind?: boolean;
   checkLookup?: string[];
+  forceNewStage?: boolean;
 }
 interface Lookup {
   /**
@@ -614,7 +615,11 @@ export default class AggregationBuilder {
     /**
      * @see Match
      */
-    if (this.aggs.length && this.aggs[this.aggs.length - 1].$match)
+    if (
+      !options?.forceNewStage &&
+      this.aggs.length &&
+      this.aggs[this.aggs.length - 1].$match
+    )
       stage = this.aggs.pop();
     else stage = { $match: {} };
 
@@ -646,7 +651,11 @@ export default class AggregationBuilder {
     /**
      * @see Match
      */
-    if (this.aggs.length && this.aggs[this.aggs.length - 1].$match)
+    if (
+      !options?.forceNewStage &&
+      this.aggs.length &&
+      this.aggs[this.aggs.length - 1].$match
+    )
       stage = this.aggs.pop();
     else stage = { $match: {} };
 
